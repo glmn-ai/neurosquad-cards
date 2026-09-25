@@ -1,0 +1,170 @@
+{
+  "$schema": "./node_modules/@neurosquad/card-sdk/schema/neurosquad-card.v1.json",
+  "manifestVersion": 1,
+  "name": "launch-control",
+  "displayName": {
+    "en": "Launch Control",
+    "ru": "Центр запуска",
+    "zh": "发射控制"
+  },
+  "version": "1.0.0",
+  "protocol": 1,
+  "description": {
+    "en": "A mission-control Go/No-Go board for releases: a countdown, launch checks your agents can set, and a GO signal when everything is green.",
+    "ru": "Пульт Go/No-Go для релизов: обратный отсчёт, проверки, которые ставят ваши агенты, и сигнал GO, когда всё зелёное.",
+    "zh": "用于发布的任务控制 Go/No-Go 面板：倒计时、智能体可以设置的发射检查项，全部通过时发出 GO 信号。"
+  },
+  "author": { "name": "NeuroSquad examples" },
+  "license": "MIT",
+  "keywords": ["release", "checklist", "countdown", "go-no-go"],
+  "icon": "icon.png",
+  "entry": "dist/index.html",
+  "card": {
+    "defaultSize": { "w": 640, "h": 420 },
+    "minSize": { "w": 240, "h": 160 },
+    "maxSize": { "w": 1600, "h": 1200 }
+  },
+  "permissions": [
+    {
+      "id": "cards.connected",
+      "optional": true,
+      "reason": {
+        "en": "Only if you send the status report into a connected note, checklist or sticky.",
+        "ru": "Только если вы отправляете отчёт в подключённую заметку, список или стикер.",
+        "zh": "仅当你把状态报告发送到已连接的笔记、清单或便签时需要。"
+      }
+    }
+  ],
+  "settings": [
+    {
+      "key": "title",
+      "type": "string",
+      "label": { "en": "Mission name", "ru": "Название миссии", "zh": "任务名称" },
+      "default": "Release",
+      "maxLength": 60
+    },
+    {
+      "key": "brief",
+      "type": "text",
+      "label": { "en": "Mission brief", "ru": "Брифинг", "zh": "任务简报" },
+      "description": {
+        "en": "One or two lines shown under the name — and given to agents that list the checks.",
+        "ru": "Одна-две строки под названием — их же получают агенты, читающие список проверок.",
+        "zh": "显示在名称下方的一两行文字——读取检查项的智能体也会看到。"
+      },
+      "default": "",
+      "maxLength": 400
+    },
+    {
+      "key": "skin",
+      "type": "select",
+      "label": { "en": "Look", "ru": "Оформление", "zh": "外观" },
+      "default": "phosphor",
+      "options": [
+        { "value": "phosphor", "label": { "en": "Phosphor (amber CRT)", "ru": "Люминофор (янтарный ЭЛТ)", "zh": "荧光（琥珀色 CRT）" } },
+        { "value": "blueprint", "label": { "en": "Blueprint", "ru": "Чертёж", "zh": "蓝图" } },
+        { "value": "app", "label": { "en": "Match the app theme", "ru": "Как тема приложения", "zh": "跟随应用主题" } }
+      ]
+    },
+    {
+      "key": "accent",
+      "type": "color",
+      "label": { "en": "Glow colour (Phosphor, Blueprint)", "ru": "Цвет свечения (Люминофор, Чертёж)", "zh": "发光颜色（荧光、蓝图）" },
+      "default": "#ffb000"
+    },
+    {
+      "key": "showSeconds",
+      "type": "boolean",
+      "label": { "en": "Show seconds on the clock", "ru": "Показывать секунды", "zh": "显示秒数" },
+      "default": true
+    },
+    {
+      "key": "warnMinutes",
+      "type": "number",
+      "label": {
+        "en": "Warn when checks are still pending this many minutes before T−0",
+        "ru": "Предупреждать, если проверки не готовы за столько минут до T−0",
+        "zh": "距 T−0 还剩多少分钟时，若仍有待定检查项则发出警告"
+      },
+      "default": 10,
+      "min": 0,
+      "max": 1440,
+      "step": 1
+    }
+  ],
+  "ports": {
+    "inputs": [
+      {
+        "id": "checks",
+        "label": { "en": "Checks", "ru": "Проверки", "zh": "检查项" },
+        "description": {
+          "en": "A list of tasks (a connected checklist or task board) becomes the launch checks: done → GO, error → NO-GO, anything else → pending.",
+          "ru": "Список задач (подключённый список или доска) становится проверками: сделано → GO, ошибка → NO-GO, остальное — ожидание.",
+          "zh": "任务列表（已连接的清单或看板）会变成发射检查项：完成 → GO，出错 → NO-GO，其他 → 待定。"
+        },
+        "type": "ns:tasks",
+        "default": true
+      }
+    ],
+    "outputs": [
+      {
+        "id": "go",
+        "label": { "en": "GO signal", "ru": "Сигнал GO", "zh": "GO 信号" },
+        "description": {
+          "en": "Sent once when every check turns GO: { type: \"go\", data: { title, checks } }. Wire it to an agent to start the release.",
+          "ru": "Отправляется один раз, когда все проверки стали GO: { type: \"go\", data: { title, checks } }. Проведите к агенту, чтобы он начал релиз.",
+          "zh": "所有检查项变为 GO 时发送一次：{ type: \"go\", data: { title, checks } }。连到智能体即可开始发布。"
+        },
+        "type": "ns:event",
+        "retain": true
+      },
+      {
+        "id": "report",
+        "label": { "en": "Status report", "ru": "Отчёт о статусе", "zh": "状态报告" },
+        "description": {
+          "en": "The board as a Markdown checklist, from the card menu → Send status report.",
+          "ru": "Доска в виде списка Markdown — из меню карточки → «Отправить отчёт».",
+          "zh": "以 Markdown 清单形式输出的面板——通过卡片菜单 →“发送状态报告”。"
+        },
+        "type": "ns:markdown"
+      }
+    ]
+  },
+  "tools": [
+    {
+      "name": "list_checks",
+      "title": "List launch checks",
+      "description": "Returns the Go/No-Go board: mission name and brief, the countdown to launch (T-minus), and every check with its id, status (go, nogo or pending), note and who set it.",
+      "inputSchema": { "type": "object", "additionalProperties": false, "properties": {} },
+      "readOnly": true
+    },
+    {
+      "name": "set_check",
+      "title": "Set a launch check",
+      "description": "Sets one launch check to go, nogo or pending, with an optional short note explaining why (shown to the user). Refer to the check by its id from list_checks or by its exact name. Setting nogo alerts the user.",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["check", "status"],
+        "properties": {
+          "check": { "type": "string", "minLength": 1, "maxLength": 120, "description": "Check id or exact name." },
+          "status": { "enum": ["go", "nogo", "pending"] },
+          "note": { "type": "string", "maxLength": 280, "description": "Why — e.g. \"412 tests passed\" or \"migration 0042 drops a column\"." }
+        }
+      }
+    },
+    {
+      "name": "add_check",
+      "title": "Add a launch check",
+      "description": "Adds a pending launch check to the board (does nothing if a check with that name exists). Returns its id.",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1, "maxLength": 120 }
+        }
+      }
+    }
+  ]
+}

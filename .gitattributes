@@ -1,0 +1,12 @@
+# Text is stored and checked out with LF everywhere. Card folders are hashed
+# byte for byte (the "tree hash" in verified.json), so a CRLF checkout on
+# Windows would make `neurosquad-card pack` print a different hash locally than
+# the one the app computes from GitHub's archive.
+* text=auto eol=lf
+*.png binary
+*.webp binary
+*.jpg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary

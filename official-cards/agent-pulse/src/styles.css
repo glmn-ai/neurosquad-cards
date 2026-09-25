@@ -1,0 +1,578 @@
+/* Agent Pulse — on top of the SDK kit's --ns-* theme variables (they follow the app theme). */
+:root {
+  --c-working: var(--ns-accent, #3b82f6);
+  --c-waiting: var(--ns-warning, #f5a524);
+  --c-finished: var(--ns-success, #17c964);
+  --c-idle: color-mix(in oklab, var(--ns-muted, #71717a) 55%, transparent);
+  --c-exited: var(--ns-danger, #f31260);
+  --line: color-mix(in oklab, var(--ns-border, #27272a) 80%, transparent);
+  --lane-h: 44px;
+  --meta-w: clamp(150px, 34%, 250px);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: var(--ns-background, #0b0b0d);
+  color: var(--ns-foreground, #ececec);
+  font-family: var(--ns-font-sans, system-ui, sans-serif);
+}
+
+#root {
+  container: pulse / size;
+}
+
+.pulse {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px 10px;
+  gap: 10px;
+  background:
+    radial-gradient(120% 80% at 100% 0%, color-mix(in oklab, var(--c-working) 10%, transparent), transparent 60%),
+    linear-gradient(var(--ns-background, #0b0b0d), var(--ns-background, #0b0b0d));
+}
+
+.pulse[data-paused] *,
+.pulse[data-paused] *::before,
+.pulse[data-paused] *::after {
+  animation-play-state: paused !important;
+}
+
+/* --- header ------------------------------------------------------------------ */
+
+.pulse-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.kpis {
+  display: flex;
+  gap: 18px;
+  min-width: 0;
+}
+
+.kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.kpi-value {
+  font-size: 22px;
+  font-weight: 650;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.kpi-label {
+  font-size: 11px;
+  color: var(--ns-muted, #a1a1aa);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.kpi--accent .kpi-value {
+  color: var(--c-working);
+}
+.kpi--warning .kpi-value {
+  color: var(--c-waiting);
+}
+.kpi.is-live .kpi-value {
+  text-shadow: 0 0 18px color-mix(in oklab, currentColor 55%, transparent);
+}
+
+.segmented {
+  display: inline-flex;
+  flex: none;
+  padding: 2px;
+  border-radius: 999px;
+  background: var(--ns-surface-secondary, #1f1f23);
+  border: 1px solid var(--line);
+}
+
+.segmented button {
+  all: unset;
+  cursor: pointer;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  color: var(--ns-muted, #a1a1aa);
+  font-variant-numeric: tabular-nums;
+}
+.segmented button:hover {
+  color: var(--ns-foreground, #fff);
+}
+.segmented button.is-on {
+  background: var(--ns-default, #3f3f46);
+  color: var(--ns-foreground, #fff);
+}
+.segmented button:focus-visible {
+  outline: 2px solid var(--ns-focus, var(--c-working));
+}
+
+/* --- "read by an agent" pill (the just-touched state) --------------------------- */
+
+.read-pill {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px 3px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  color: var(--ns-accent-soft-foreground, var(--c-working));
+  background: var(--ns-accent-soft, color-mix(in oklab, var(--c-working) 18%, transparent));
+  animation: pill-in 300ms ease-out, pill-out 600ms ease-in 7.4s forwards;
+}
+.read-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 8px currentColor;
+}
+@keyframes pill-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+@keyframes pill-out {
+  to {
+    opacity: 0;
+  }
+}
+.pulse:not(:has(.read-pill)) {
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+
+/* --- lanes ---------------------------------------------------------------------- */
+
+.lanes {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ns-default, #3f3f46) transparent;
+}
+
+.axis {
+  display: grid;
+  grid-template-columns: var(--meta-w) minmax(0, 1fr) auto;
+  gap: 12px;
+  height: 16px;
+  flex: none;
+}
+.axis-track {
+  position: relative;
+  font-size: 10px;
+  color: var(--ns-muted, #a1a1aa);
+  font-variant-numeric: tabular-nums;
+}
+.axis-tick {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+.axis-now {
+  position: absolute;
+  right: 0;
+  top: 0;
+  color: var(--ns-foreground, #fff);
+}
+
+.lane {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--meta-w) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-height: var(--lane-h);
+  flex: none;
+  border-top: 1px solid var(--line);
+}
+
+.lane-flash {
+  position: absolute;
+  inset: 0 -14px;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, color-mix(in oklab, var(--lane-c) 22%, transparent) 30%, transparent);
+  animation: flash 1.6s ease-out forwards;
+}
+@keyframes flash {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.lane-meta {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+
+.lane-dot {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--lane-c);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--lane-c) 18%, transparent);
+}
+.st-working .lane-dot,
+.st-waiting .lane-dot {
+  animation: beat 1.4s ease-in-out infinite;
+}
+.st-waiting .lane-dot {
+  animation-duration: 0.9s;
+}
+@keyframes beat {
+  50% {
+    box-shadow: 0 0 0 6px color-mix(in oklab, var(--lane-c) 0%, transparent);
+  }
+}
+
+.lane-names {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.lane-title {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+}
+.lane-name {
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lane-sub {
+  display: flex;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--ns-muted, #a1a1aa);
+  white-space: nowrap;
+  overflow: hidden;
+}
+.lane-harness {
+  flex: none;
+  padding: 0 5px;
+  border-radius: 4px;
+  font-size: 10px;
+  line-height: 15px;
+  background: var(--ns-surface-secondary, #1f1f23);
+  color: var(--ns-muted, #a1a1aa);
+}
+.lane-status {
+  color: var(--lane-c-text, var(--ns-muted));
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lane-since {
+  flex: none;
+  font-variant-numeric: tabular-nums;
+  color: var(--ns-muted, #a1a1aa);
+}
+.lane-since::before {
+  content: '·';
+  margin-right: 6px;
+}
+
+.lane-track {
+  position: relative;
+  height: 14px;
+  border-radius: 7px;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 calc(25% - 1px), var(--line) calc(25% - 1px) 25%),
+    color-mix(in oklab, var(--ns-surface, #18181b) 70%, transparent);
+  overflow: hidden;
+}
+.lane-track::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: -2px;
+  bottom: -2px;
+  width: 2px;
+  background: var(--ns-foreground, #fff);
+  opacity: 0.5;
+}
+
+.blk {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: var(--lane-c);
+}
+.blk.st-idle {
+  background: transparent;
+}
+.blk.st-finished {
+  top: 6px;
+  bottom: 6px;
+  opacity: 0.35;
+}
+.blk.st-working {
+  background: linear-gradient(180deg, color-mix(in oklab, var(--lane-c) 100%, white 12%), var(--lane-c));
+  box-shadow: 0 0 10px color-mix(in oklab, var(--lane-c) 45%, transparent);
+}
+.blk.st-waiting {
+  background: repeating-linear-gradient(
+    135deg,
+    var(--lane-c) 0 5px,
+    color-mix(in oklab, var(--lane-c) 55%, transparent) 5px 10px
+  );
+}
+.blk.st-exited {
+  top: 6px;
+  bottom: 6px;
+  opacity: 0.6;
+}
+
+.st-working {
+  --lane-c: var(--c-working);
+  --lane-c-text: var(--c-working);
+}
+.st-waiting {
+  --lane-c: var(--c-waiting);
+  --lane-c-text: var(--c-waiting);
+}
+.st-finished {
+  --lane-c: var(--c-finished);
+  --lane-c-text: var(--c-finished);
+}
+.st-idle {
+  --lane-c: var(--c-idle);
+}
+.st-exited {
+  --lane-c: var(--c-exited);
+  --lane-c-text: var(--c-exited);
+}
+
+.lane-stats {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  color: var(--ns-muted, #a1a1aa);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.spark {
+  display: none;
+  align-items: flex-end;
+  gap: 2px;
+  height: 20px;
+  width: 64px;
+  justify-content: flex-end;
+}
+.spark i {
+  width: 3px;
+  border-radius: 1px;
+  background: color-mix(in oklab, var(--c-working) 70%, transparent);
+}
+.lane-busy {
+  display: none;
+}
+
+/* --- footer ------------------------------------------------------------------ */
+
+.pulse-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 11.5px;
+  color: var(--ns-muted, #a1a1aa);
+  white-space: nowrap;
+  overflow: hidden;
+}
+.pulse-foot > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.foot-warn {
+  color: var(--c-waiting);
+}
+
+/* --- states --------------------------------------------------------------------- */
+
+.pulse--state {
+  display: grid;
+  place-items: center;
+}
+.state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+  max-width: 340px;
+  padding: 8px;
+}
+.state-glyph {
+  color: var(--c-working);
+  filter: drop-shadow(0 0 10px color-mix(in oklab, var(--c-working) 60%, transparent));
+  margin-bottom: 4px;
+}
+.state-glyph path {
+  stroke-dasharray: 240;
+  animation: draw 2.8s ease-in-out infinite;
+}
+.state-glyph--danger {
+  color: var(--ns-danger, #f31260);
+  filter: none;
+}
+.state-glyph--danger path {
+  animation: none;
+}
+@keyframes draw {
+  0% {
+    stroke-dashoffset: 240;
+  }
+  60%,
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+.state-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+.state-body {
+  margin: 0 0 6px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--ns-muted, #a1a1aa);
+  word-break: break-word;
+}
+
+.skel,
+.skel-line {
+  position: relative;
+  overflow: hidden;
+  border-radius: 6px;
+  background: var(--ns-surface-secondary, #1f1f23);
+}
+.skel-line {
+  display: block;
+  height: 10px;
+}
+.kpi.skel {
+  width: 56px;
+  height: 38px;
+}
+.kpi.skel > * {
+  visibility: hidden;
+}
+.skel::after,
+.skel-line::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, color-mix(in oklab, var(--ns-foreground, #fff) 7%, transparent), transparent);
+  animation: shimmer 1.4s infinite;
+}
+@keyframes shimmer {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+/* --- sizes -------------------------------------------------------------------- */
+
+/* Wide (big card or expanded): spark bars and busy share. */
+@container pulse (min-width: 760px) {
+  .spark,
+  .lane-busy {
+    display: inline-flex;
+  }
+  .kpi-value {
+    font-size: 26px;
+  }
+  .kpis {
+    gap: 28px;
+  }
+  .lane {
+    min-height: 52px;
+  }
+  .lane-track {
+    height: 18px;
+  }
+}
+
+/* Narrow: no stats column, fewer KPIs. */
+@container pulse (max-width: 480px) {
+  .kpi--wide {
+    display: none;
+  }
+  .lane-stats {
+    display: none;
+  }
+  .lane,
+  .axis {
+    grid-template-columns: minmax(96px, 38%) minmax(0, 1fr);
+  }
+  .foot-longest {
+    display: none;
+  }
+}
+
+/* Tiny: a list with dots, timers and a thin track. */
+@container pulse (max-width: 330px) {
+  .pulse {
+    padding: 8px 10px;
+    gap: 6px;
+  }
+  .segmented,
+  .axis,
+  .pulse-foot {
+    display: none;
+  }
+  .pulse:not(:has(.read-pill)) {
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+  .lane {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 34px;
+    gap: 2px;
+    padding: 4px 0;
+  }
+  .lane-track {
+    height: 4px;
+  }
+  .kpi-value {
+    font-size: 18px;
+  }
+}
+
+@container pulse (max-height: 200px) {
+  .axis,
+  .pulse-foot {
+    display: none;
+  }
+}

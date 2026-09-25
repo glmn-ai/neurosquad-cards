@@ -1,0 +1,109 @@
+{
+  "$schema": "./node_modules/@neurosquad/card-sdk/schema/neurosquad-card.v1.json",
+  "manifestVersion": 1,
+  "name": "repo-radar",
+  "displayName": {
+    "en": "Repo Radar",
+    "ru": "Радар репозитория",
+    "zh": "仓库雷达"
+  },
+  "version": "1.0.0",
+  "protocol": 1,
+  "description": {
+    "en": "Open pull requests and CI of a GitHub repository on the canvas. Agents can check CI after they push.",
+    "ru": "Открытые пулл-реквесты и CI репозитория GitHub прямо на холсте. Агенты могут проверить CI после пуша.",
+    "zh": "在画布上查看 GitHub 仓库的未合并拉取请求和 CI。智能体推送后可以查询 CI 状态。"
+  },
+  "author": { "name": "NeuroSquad examples" },
+  "license": "MIT",
+  "keywords": ["github", "ci", "pull-requests", "network"],
+  "icon": "icon.png",
+  "entry": "dist/index.html",
+  "card": {
+    "defaultSize": { "w": 520, "h": 420 },
+    "minSize": { "w": 240, "h": 160 },
+    "maxSize": { "w": 1600, "h": 1400 }
+  },
+  "permissions": [
+    {
+      "id": "network",
+      "hosts": ["api.github.com"],
+      "reason": {
+        "en": "Reads pull requests and workflow runs from the GitHub API. Only api.github.com, and only while the card is on screen.",
+        "ru": "Читает пулл-реквесты и запуски из GitHub API. Только api.github.com и только пока карточка на экране.",
+        "zh": "从 GitHub API 读取拉取请求和工作流运行。仅限 api.github.com，且仅在卡片可见时。"
+      }
+    },
+    {
+      "id": "fs.read",
+      "optional": true,
+      "reason": {
+        "en": "Only if you press \"Detect from this folder\": reads .git/config to find the GitHub remote.",
+        "ru": "Только если нажать «Взять из этой папки»: читает .git/config, чтобы найти удалённый репозиторий GitHub.",
+        "zh": "仅当你点击“从此文件夹检测”时：读取 .git/config 以找到 GitHub 远程仓库。"
+      }
+    }
+  ],
+  "settings": [
+    {
+      "key": "repo",
+      "type": "string",
+      "label": { "en": "Repository", "ru": "Репозиторий", "zh": "仓库" },
+      "description": {
+        "en": "owner/repo or a github.com link.",
+        "ru": "владелец/репозиторий или ссылка на github.com.",
+        "zh": "owner/repo 或 github.com 链接。"
+      },
+      "placeholder": { "en": "owner/repo", "ru": "владелец/репозиторий", "zh": "owner/repo" },
+      "maxLength": 200
+    },
+    {
+      "key": "token",
+      "type": "secret",
+      "label": { "en": "GitHub token (optional)", "ru": "Токен GitHub (необязательно)", "zh": "GitHub 令牌（可选）" },
+      "description": {
+        "en": "For private repositories and 5000 requests an hour instead of 60. Read-only access is enough. The card never sees it: NeuroSquad adds it to requests to api.github.com.",
+        "ru": "Для приватных репозиториев и 5000 запросов в час вместо 60. Достаточно доступа на чтение. Карточка его не видит: NeuroSquad сам подставляет его в запросы к api.github.com.",
+        "zh": "用于私有仓库，并把每小时请求额度从 60 提高到 5000。只读权限即可。卡片看不到它：NeuroSquad 只在请求 api.github.com 时附加。"
+      }
+    },
+    {
+      "key": "intervalMin",
+      "type": "number",
+      "label": {
+        "en": "Refresh every (minutes, while on screen)",
+        "ru": "Обновлять каждые (минут, пока на экране)",
+        "zh": "刷新间隔（分钟，仅在可见时）"
+      },
+      "default": 5,
+      "min": 2,
+      "max": 120,
+      "step": 1
+    }
+  ],
+  "ports": {
+    "outputs": [
+      {
+        "id": "ci",
+        "label": { "en": "CI changed", "ru": "CI изменился", "zh": "CI 变化" },
+        "description": {
+          "en": "When the default branch's CI changes state: { type: \"ci\", data: { repo, branch, state, previous, sha, run, url } }.",
+          "ru": "Когда CI основной ветки меняет состояние: { type: \"ci\", data: { repo, branch, state, previous, sha, run, url } }.",
+          "zh": "默认分支的 CI 状态变化时：{ type: \"ci\", data: { repo, branch, state, previous, sha, run, url } }。"
+        },
+        "type": "ns:event",
+        "retain": true
+      }
+    ]
+  },
+  "tools": [
+    {
+      "name": "status",
+      "title": "Repository CI status",
+      "description": "Returns the GitHub repository this card watches: CI state of the default branch (latest workflow run, with its URL), every open pull request with its branch, head commit and CI state, and the latest workflow runs. Data is refreshed if it is older than a minute. Call it after pushing to see whether CI passed.",
+      "inputSchema": { "type": "object", "additionalProperties": false, "properties": {} },
+      "readOnly": true,
+      "timeoutMs": 45000
+    }
+  ]
+}

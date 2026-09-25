@@ -1,0 +1,7 @@
+node_modules
+# packed archives (neurosquad-card pack)
+*.tgz
+.DS_Store
+# dist/ is committed: NeuroSquad installs the built card straight from the repository.
+# (Explicitly re-included, in case a parent repository ignores dist/.)
+!dist/

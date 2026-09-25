@@ -1,0 +1,295 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/glmn-ai/neurosquad-cards/blob/main/verified.schema.json",
+  "title": "NeuroSquad verified cards catalog",
+  "description": "verified.json v1: the community cards NeuroSquad has reviewed, each pinned to one exact commit and tree hash.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "updatedAt",
+    "cards"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "schemaVersion": {
+      "const": 1
+    },
+    "updatedAt": {
+      "description": "When this file last changed (UTC, RFC 3339).",
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+    },
+    "cards": {
+      "description": "Sorted by id.",
+      "type": "array",
+      "maxItems": 5000,
+      "items": {
+        "$ref": "#/$defs/card"
+      }
+    }
+  },
+  "$defs": {
+    "githubLogin": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9]|-(?=[A-Za-z0-9])){0,38}$"
+    },
+    "semver": {
+      "type": "string",
+      "maxLength": 64,
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:-[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?(?:\\+[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?$"
+    },
+    "packagePath": {
+      "description": "A relative POSIX path inside the package folder (or the repository): no leading slash, no '.'/'..' or hidden segments.",
+      "type": "string",
+      "maxLength": 240,
+      "pattern": "^[A-Za-z0-9_-][A-Za-z0-9._-]*(?:/[A-Za-z0-9_-][A-Za-z0-9._-]*)*$"
+    },
+    "permissionId": {
+      "enum": [
+        "agents.read",
+        "agents.output",
+        "agents.prompt",
+        "terminals.write",
+        "cards.connected",
+        "network",
+        "network.local",
+        "fs.read",
+        "fs.write",
+        "clipboard.write",
+        "canvas.spawn",
+        "background",
+        "usage.read"
+      ]
+    },
+    "card": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "packageId",
+        "name",
+        "description",
+        "author",
+        "repo",
+        "version",
+        "commit",
+        "treeHash",
+        "permissions",
+        "category",
+        "license",
+        "official",
+        "verifiedAt",
+        "reviewer"
+      ],
+      "properties": {
+        "id": {
+          "description": "Unique slug of this catalog entry.",
+          "type": "string",
+          "pattern": "^[a-z0-9-]{2,64}$"
+        },
+        "packageId": {
+          "description": "The package's own id: the `name` field of its neurosquad-card.json.",
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]{1,47}$"
+        },
+        "name": {
+          "description": "Display name (the manifest displayName).",
+          "$ref": "#/$defs/localizedName"
+        },
+        "description": {
+          "description": "Short description; en required.",
+          "$ref": "#/$defs/localizedDescription"
+        },
+        "author": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "github"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "github": {
+              "$ref": "#/$defs/githubLogin"
+            }
+          }
+        },
+        "repo": {
+          "description": "owner/repo on github.com.",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9]|-(?=[A-Za-z0-9])){0,38}/[A-Za-z0-9._-]{1,100}$"
+        },
+        "path": {
+          "description": "The package folder inside the repository; omitted when the package is the repository root.",
+          "$ref": "#/$defs/packagePath"
+        },
+        "version": {
+          "description": "The manifest version that was reviewed.",
+          "$ref": "#/$defs/semver"
+        },
+        "commit": {
+          "description": "The exact reviewed commit, reachable from the repository's default branch.",
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "treeHash": {
+          "description": "sha256 (hex) of the package's tree hash input at that commit, as the app computes it at install.",
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "permissions": {
+          "description": "Required (non-optional) permission ids declared by the manifest, sorted.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/permissionId"
+          }
+        },
+        "optionalPermissions": {
+          "description": "Optional permission ids declared by the manifest, sorted.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/permissionId"
+          }
+        },
+        "networkHosts": {
+          "description": "Every host of the manifest's `network` permission, sorted.",
+          "type": "array",
+          "uniqueItems": true,
+          "maxItems": 32,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 253
+          }
+        },
+        "tags": {
+          "type": "array",
+          "uniqueItems": true,
+          "maxItems": 10,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9-]{0,31}$"
+          }
+        },
+        "category": {
+          "enum": [
+            "agents",
+            "productivity",
+            "dev-tools",
+            "data",
+            "integrations",
+            "fun",
+            "other"
+          ]
+        },
+        "license": {
+          "description": "SPDX license identifier (or expression) of the package.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "homepage": {
+          "type": "string",
+          "maxLength": 500,
+          "pattern": "^https://[^\\s]+$"
+        },
+        "icon": {
+          "description": "Path inside the package folder (PNG or WebP).",
+          "type": "string",
+          "maxLength": 240,
+          "pattern": "^(?=.*\\.(png|webp)$)[A-Za-z0-9_-][A-Za-z0-9._-]*(?:/[A-Za-z0-9_-][A-Za-z0-9._-]*)*$"
+        },
+        "screenshots": {
+          "description": "Paths inside the package folder.",
+          "type": "array",
+          "uniqueItems": true,
+          "maxItems": 8,
+          "items": {
+            "type": "string",
+            "maxLength": 240,
+            "pattern": "^(?=.*\\.(png|webp|jpg|jpeg|gif)$)[A-Za-z0-9_-][A-Za-z0-9._-]*(?:/[A-Za-z0-9_-][A-Za-z0-9._-]*)*$"
+          }
+        },
+        "minAppVersion": {
+          "$ref": "#/$defs/semver"
+        },
+        "official": {
+          "description": "True only for glmn-ai's own cards.",
+          "type": "boolean"
+        },
+        "verifiedAt": {
+          "description": "Review date (UTC).",
+          "type": "string",
+          "format": "date",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "reviewer": {
+          "$ref": "#/$defs/githubLogin"
+        },
+        "notes": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        }
+      }
+    },
+    "localizedName": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "en"
+      ],
+      "properties": {
+        "en": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "ru": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "zh": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        }
+      }
+    },
+    "localizedDescription": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "en"
+      ],
+      "properties": {
+        "en": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        "ru": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        "zh": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,115 @@
+{
+  "$schema": "./node_modules/@neurosquad/card-sdk/schema/neurosquad-card.v1.json",
+  "manifestVersion": 1,
+  "name": "agent-pulse",
+  "displayName": {
+    "en": "Agent Pulse",
+    "ru": "Пульс агентов",
+    "zh": "智能体脉搏"
+  },
+  "version": "1.0.0",
+  "protocol": 1,
+  "description": {
+    "en": "A live pulse of every agent on the canvas: status timelines, turn durations, and how long each one has been waiting for you.",
+    "ru": "Живой пульс всех агентов на холсте: шкалы статусов, длительность ходов и сколько каждый ждёт вашего ответа.",
+    "zh": "画布上所有智能体的实时脉搏：状态时间线、每轮耗时，以及每个智能体等了你多久。"
+  },
+  "author": { "name": "NeuroSquad examples" },
+  "license": "MIT",
+  "keywords": ["agents", "dashboard", "timeline", "monitoring"],
+  "icon": "icon.png",
+  "entry": "dist/index.html",
+  "card": {
+    "defaultSize": { "w": 560, "h": 380 },
+    "minSize": { "w": 260, "h": 180 },
+    "maxSize": { "w": 1600, "h": 1200 }
+  },
+  "permissions": [
+    {
+      "id": "agents.read",
+      "reason": {
+        "en": "Draws each agent's status over time. It never reads what agents print.",
+        "ru": "Рисует статус каждого агента во времени. Вывод агентов не читает.",
+        "zh": "绘制每个智能体随时间变化的状态，从不读取智能体的输出。"
+      }
+    },
+    {
+      "id": "cards.connected",
+      "optional": true,
+      "reason": {
+        "en": "Only if you send a report into a connected note, checklist or sticky.",
+        "ru": "Только если вы отправляете отчёт в подключённую заметку, список или стикер.",
+        "zh": "仅当你把报告发送到已连接的笔记、清单或便签时需要。"
+      }
+    }
+  ],
+  "settings": [
+    {
+      "key": "nudgeAfterMin",
+      "type": "number",
+      "label": {
+        "en": "Nudge me when an agent waits longer than (minutes, 0 = never)",
+        "ru": "Напомнить, если агент ждёт дольше (минут, 0 — никогда)",
+        "zh": "智能体等待超过多久时提醒我（分钟，0 = 从不）"
+      },
+      "default": 5,
+      "min": 0,
+      "max": 240,
+      "step": 1
+    },
+    {
+      "key": "showShells",
+      "type": "boolean",
+      "label": {
+        "en": "Show terminals too",
+        "ru": "Показывать и терминалы",
+        "zh": "同时显示终端"
+      },
+      "default": false
+    }
+  ],
+  "ports": {
+    "outputs": [
+      {
+        "id": "report",
+        "label": { "en": "Report", "ru": "Отчёт", "zh": "报告" },
+        "description": {
+          "en": "A Markdown table of every agent's status, turns and busy time — sent when you pick \"Send report\".",
+          "ru": "Таблица Markdown: статус, ходы и занятость каждого агента — по пункту «Отправить отчёт».",
+          "zh": "每个智能体的状态、轮次和忙碌时间的 Markdown 表格——选择“发送报告”时发送。"
+        },
+        "type": "ns:markdown"
+      },
+      {
+        "id": "turns",
+        "label": { "en": "Finished turns", "ru": "Завершённые ходы", "zh": "已完成的轮次" },
+        "description": {
+          "en": "One event per finished turn: { type: \"turn\", data: { agent, durationMs, endedAs } }.",
+          "ru": "Событие на каждый завершённый ход: { type: \"turn\", data: { agent, durationMs, endedAs } }.",
+          "zh": "每完成一轮发出一个事件：{ type: \"turn\", data: { agent, durationMs, endedAs } }。"
+        },
+        "type": "ns:event"
+      }
+    ]
+  },
+  "tools": [
+    {
+      "name": "report",
+      "title": "Agent pulse report",
+      "description": "Returns what every agent in this workspace is doing right now (working, waiting for the user, finished, idle), for how long, how many turns each finished recently and how busy each was. Use it to find an idle agent to delegate to, or to see who is blocked on the user.",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "windowMinutes": {
+            "type": "integer",
+            "minimum": 5,
+            "maximum": 1440,
+            "description": "How far back the turn statistics look. Default 60."
+          }
+        }
+      },
+      "readOnly": true
+    }
+  ]
+}

@@ -1,0 +1,155 @@
+{
+  "$schema": "./node_modules/@neurosquad/card-sdk/schema/neurosquad-card.v1.json",
+  "manifestVersion": 1,
+  "name": "decision-log",
+  "displayName": {
+    "en": "Decision Log",
+    "ru": "Журнал решений",
+    "zh": "决策日志"
+  },
+  "version": "1.0.0",
+  "protocol": 1,
+  "description": {
+    "en": "Agents record architecture decisions here over MCP; you search, review, accept or reject them, and export them as ADR files.",
+    "ru": "Агенты записывают сюда архитектурные решения через MCP; вы ищете, проверяете, принимаете или отклоняете их и выгружаете как файлы ADR.",
+    "zh": "智能体通过 MCP 在这里记录架构决策；你可以搜索、审阅、接受或拒绝，并导出为 ADR 文件。"
+  },
+  "author": { "name": "NeuroSquad examples" },
+  "license": "MIT",
+  "keywords": ["adr", "decisions", "mcp", "review", "documentation"],
+  "icon": "icon.png",
+  "entry": "dist/index.html",
+  "card": {
+    "defaultSize": { "w": 640, "h": 440 },
+    "minSize": { "w": 280, "h": 200 },
+    "maxSize": { "w": 1800, "h": 1400 }
+  },
+  "permissions": [
+    {
+      "id": "fs.write",
+      "optional": true,
+      "reason": {
+        "en": "Only when you choose \"Export as ADR files\": writes docs/adr/*.md in the workspace folder.",
+        "ru": "Только по пункту «Выгрузить как файлы ADR»: пишет docs/adr/*.md в папку воркспейса.",
+        "zh": "仅当你选择“导出为 ADR 文件”时：在工作区文件夹中写入 docs/adr/*.md。"
+      }
+    },
+    {
+      "id": "cards.connected",
+      "optional": true,
+      "reason": {
+        "en": "Only when you send a decision into a connected note or checklist.",
+        "ru": "Только когда вы отправляете решение в подключённую заметку или список.",
+        "zh": "仅当你把决策发送到已连接的笔记或清单时需要。"
+      }
+    }
+  ],
+  "settings": [
+    {
+      "key": "agentsMayAccept",
+      "type": "boolean",
+      "label": {
+        "en": "Agents may accept decisions themselves",
+        "ru": "Агенты могут сами принимать решения",
+        "zh": "允许智能体自行接受决策"
+      },
+      "description": {
+        "en": "Off: whatever an agent records stays \"proposed\" until you accept it.",
+        "ru": "Выключено: всё, что записал агент, остаётся «предложенным», пока вы его не примете.",
+        "zh": "关闭时：智能体记录的内容在你接受之前一直是“提议”。"
+      },
+      "default": false
+    }
+  ],
+  "ports": {
+    "outputs": [
+      {
+        "id": "decisions",
+        "label": { "en": "Accepted decisions", "ru": "Принятые решения", "zh": "已接受的决策" },
+        "description": {
+          "en": "Each decision as Markdown when it is accepted (or sent by hand).",
+          "ru": "Каждое решение в Markdown, когда его принимают (или отправляют вручную).",
+          "zh": "每条决策在被接受（或手动发送）时以 Markdown 形式发出。"
+        },
+        "type": "ns:markdown"
+      }
+    ]
+  },
+  "tools": [
+    {
+      "name": "record",
+      "title": "Record a decision",
+      "description": "Records an architecture or product decision in the team's decision log (ADR style) so people and other agents can find it later. Call it whenever you choose between real alternatives (a library, a data model, an API shape, a trade-off). Returns the new id, e.g. ADR-0007. Entries you record start as \"proposed\" and the user reviews them, unless the user allowed agents to accept.",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["title", "decision"],
+        "properties": {
+          "title": { "type": "string", "minLength": 3, "maxLength": 120, "description": "Short imperative title, e.g. \"Use SQLite for the local cache\"." },
+          "decision": { "type": "string", "minLength": 1, "maxLength": 4000, "description": "What was decided and why." },
+          "context": { "type": "string", "maxLength": 4000, "description": "The situation and forces that led to it." },
+          "alternatives": {
+            "type": "array",
+            "maxItems": 10,
+            "items": { "type": "string", "maxLength": 300 },
+            "description": "Options considered and rejected, one per item, with the reason."
+          },
+          "consequences": { "type": "string", "maxLength": 2000, "description": "What becomes easier or harder." },
+          "tags": {
+            "type": "array",
+            "maxItems": 8,
+            "items": { "type": "string", "minLength": 1, "maxLength": 32 },
+            "description": "A few lowercase topics, e.g. [\"storage\", \"backend\"]."
+          },
+          "status": { "enum": ["proposed", "accepted"], "description": "Default proposed." }
+        }
+      }
+    },
+    {
+      "name": "search",
+      "title": "Search decisions",
+      "description": "Searches the decision log. Check it before making a decision that may already have been made. Returns one line per entry: id, status, title, tags, author, date — newest first.",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "query": { "type": "string", "maxLength": 200, "description": "Words that must all appear (title, text, tags)." },
+          "tag": { "type": "string", "maxLength": 32 },
+          "status": { "enum": ["proposed", "accepted", "rejected", "superseded"] },
+          "limit": { "type": "integer", "minimum": 1, "maximum": 50, "description": "Default 20." }
+        }
+      },
+      "readOnly": true
+    },
+    {
+      "name": "get",
+      "title": "Read a decision",
+      "description": "Returns one decision in full as Markdown (context, decision, alternatives, consequences, status).",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1, "maxLength": 16, "description": "e.g. \"ADR-0007\" or \"7\"." }
+        }
+      },
+      "readOnly": true
+    },
+    {
+      "name": "set_status",
+      "title": "Change a decision's status",
+      "description": "Marks a decision accepted, rejected or superseded (give supersededBy: the id of the decision that replaces it). Record the replacement first. Accepting may be reserved for the user.",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "status"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1, "maxLength": 16 },
+          "status": { "enum": ["accepted", "rejected", "superseded"] },
+          "supersededBy": { "type": "string", "maxLength": 16 },
+          "note": { "type": "string", "maxLength": 500, "description": "Why, in one sentence." }
+        }
+      }
+    }
+  ]
+}

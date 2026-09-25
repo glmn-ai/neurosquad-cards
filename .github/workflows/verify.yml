@@ -1,0 +1,85 @@
+name: verify
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    # Weekly re-check of every entry: a deleted repository, a force-pushed
+    # default branch or a renamed owner shows up here, not at a user's install.
+    - cron: '17 4 * * 1'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  catalog:
+    name: verified.json
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - run: npm ci --no-audit --no-fund
+
+      - name: Verify new and changed entries
+        if: github.event_name == 'pull_request'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/verify.mjs --changed-only "${{ github.event.pull_request.base.sha }}"
+
+      - name: Verify every entry
+        if: github.event_name != 'pull_request'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/verify.mjs
+
+  official-cards:
+    name: official card ${{ matrix.card }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        card: [agent-pulse, decision-log, launch-control, repo-radar, signal-router]
+    defaults:
+      run:
+        working-directory: official-cards/${{ matrix.card }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: official-cards/${{ matrix.card }}/package-lock.json
+
+      - run: npm ci --no-audit --no-fund
+
+      - name: Tests
+        run: npm test
+
+      - name: Build and check that the committed dist/ is up to date
+        run: |
+          npm run build
+          if [ -n "$(git status --porcelain -- dist)" ]; then
+            git status --short -- dist
+            echo "::error::official-cards/${{ matrix.card }}/dist is stale: run npm run build and commit dist/"
+            exit 1
+          fi
+
+      - name: neurosquad-card validate
+        run: npx --no-install neurosquad-card validate

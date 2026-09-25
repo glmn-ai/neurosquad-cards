@@ -1,0 +1,106 @@
+{
+  "$schema": "./node_modules/@neurosquad/card-sdk/schema/neurosquad-card.v1.json",
+  "manifestVersion": 1,
+  "name": "signal-router",
+  "displayName": {
+    "en": "Signal Router",
+    "ru": "Маршрутизатор сигналов",
+    "zh": "信号路由器"
+  },
+  "version": "1.0.0",
+  "protocol": 1,
+  "description": {
+    "en": "A patch bay for your canvas: takes whatever flows in over arrows, routes it to connected cards and agents by your rules, and shows every message with its shape.",
+    "ru": "Коммутатор для холста: принимает всё, что приходит по стрелкам, раскидывает по подключённым карточкам и агентам по вашим правилам и показывает каждое сообщение с его структурой.",
+    "zh": "画布上的配线架：接收箭头传来的任何数据，按你的规则转发给已连接的卡片和智能体，并展示每条消息及其结构。"
+  },
+  "author": { "name": "NeuroSquad examples" },
+  "license": "MIT",
+  "keywords": ["ports", "pipeline", "router", "inspector", "json"],
+  "icon": "icon.png",
+  "entry": "dist/index.html",
+  "card": {
+    "defaultSize": { "w": 640, "h": 420 },
+    "minSize": { "w": 280, "h": 200 },
+    "maxSize": { "w": 1800, "h": 1400 }
+  },
+  "permissions": [
+    {
+      "id": "cards.connected",
+      "optional": true,
+      "reason": {
+        "en": "Only when a rule sends into a connected note, checklist, board or sticky.",
+        "ru": "Только когда правило отправляет в подключённую заметку, список, доску или стикер.",
+        "zh": "仅当某条规则发送到已连接的笔记、清单、看板或便签时需要。"
+      }
+    },
+    {
+      "id": "agents.prompt",
+      "optional": true,
+      "reason": {
+        "en": "Only when a rule sends messages to a connected AI agent as prompts. Limited per rule; the app queues prompts while the agent works.",
+        "ru": "Только когда правило отправляет сообщения подключённому ИИ-агенту как промпты. С ограничением на правило; пока агент работает, приложение ставит их в очередь.",
+        "zh": "仅当某条规则把消息作为提示发送给已连接的 AI 智能体时需要。每条规则有频率限制；智能体工作时应用会排队。"
+      }
+    }
+  ],
+  "ports": {
+    "inputs": [
+      {
+        "id": "in",
+        "label": { "en": "In", "ru": "Вход", "zh": "输入" },
+        "description": {
+          "en": "Anything. Every message is shown in the inspector and routed by the rules.",
+          "ru": "Что угодно. Каждое сообщение видно в инспекторе и маршрутизируется правилами.",
+          "zh": "任意数据。每条消息都会显示在检查器中并按规则转发。"
+        },
+        "type": "ns:any",
+        "default": true
+      },
+      {
+        "id": "last",
+        "label": { "en": "Last message", "ru": "Последнее сообщение", "zh": "最后一条消息" },
+        "description": {
+          "en": "Ask for the last message that came in, with the router's counters.",
+          "ru": "Запрос последнего пришедшего сообщения вместе со счётчиками.",
+          "zh": "请求最后收到的消息以及路由计数。"
+        },
+        "type": "ns:trigger",
+        "mode": "request",
+        "response": { "type": "ns:json" }
+      }
+    ],
+    "outputs": [
+      {
+        "id": "text",
+        "label": { "en": "Text", "ru": "Текст", "zh": "文本" },
+        "description": {
+          "en": "A rule's template filled with the message (Markdown) — for notes, agents' prompts, terminals.",
+          "ru": "Шаблон правила, заполненный сообщением (Markdown), — для заметок, промптов агентам, терминалов.",
+          "zh": "用消息填充的规则模板（Markdown）——用于笔记、智能体提示、终端。"
+        },
+        "type": "ns:markdown"
+      },
+      {
+        "id": "json",
+        "label": { "en": "JSON", "ru": "JSON", "zh": "JSON" },
+        "description": {
+          "en": "The message as a JSON object (scalars are wrapped as { value }).",
+          "ru": "Сообщение как JSON-объект (скаляры оборачиваются в { value }).",
+          "zh": "作为 JSON 对象的消息（标量包装为 { value }）。"
+        },
+        "type": "ns:json"
+      },
+      {
+        "id": "event",
+        "label": { "en": "Event", "ru": "Событие", "zh": "事件" },
+        "description": {
+          "en": "The message wrapped as { type, data, at } with the rule's event type.",
+          "ru": "Сообщение, обёрнутое в { type, data, at } с типом события из правила.",
+          "zh": "包装为 { type, data, at } 的消息，事件类型取自规则。"
+        },
+        "type": "ns:event"
+      }
+    ]
+  }
+}

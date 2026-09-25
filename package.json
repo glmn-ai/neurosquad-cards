@@ -1,0 +1,21 @@
+{
+  "name": "neurosquad-cards",
+  "version": "1.0.0",
+  "private": true,
+  "description": "NeuroSquad's catalog of verified community cards (verified.json), the official cards, and the verification script CI runs on every change.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "verify": "node scripts/verify.mjs",
+    "verify:offline": "node scripts/verify.mjs --offline",
+    "format": "node scripts/verify.mjs format"
+  },
+  "devDependencies": {
+    "@neurosquad/card-sdk": "^1.0.0",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1"
+  }
+}

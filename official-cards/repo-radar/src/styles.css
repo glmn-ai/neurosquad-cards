@@ -1,0 +1,664 @@
+/* Repo Radar — on top of the SDK kit's --ns-* theme variables (they follow the app theme). */
+:root {
+  --ok: var(--ns-success, #17c964);
+  --bad: var(--ns-danger, #f31260);
+  --run: var(--ns-warning, #f5a524);
+  --off: color-mix(in oklab, var(--ns-muted, #71717a) 60%, transparent);
+  --line: color-mix(in oklab, var(--ns-border, #27272a) 80%, transparent);
+  --fg-dim: var(--ns-muted, #a1a1aa);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: var(--ns-background, #0b0b0d);
+  color: var(--ns-foreground, #ececec);
+  font-family: var(--ns-font-sans, system-ui, sans-serif);
+}
+
+#root {
+  container: radar / size;
+}
+
+.radar {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px 10px;
+  gap: 10px;
+  background:
+    radial-gradient(90% 70% at 0% 0%, color-mix(in oklab, var(--ns-accent, #3b82f6) 9%, transparent), transparent 60%),
+    var(--ns-background, #0b0b0d);
+}
+.radar[data-paused] *,
+.radar[data-paused] *::before,
+.radar[data-paused] *::after {
+  animation-play-state: paused !important;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+/* --- header ------------------------------------------------------------------------ */
+
+.rr-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: none;
+}
+.rr-id {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+.rr-repo {
+  all: unset;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  font-size: 15px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.rr-repo--static {
+  cursor: default;
+}
+.rr-repo svg {
+  flex: none;
+  color: var(--fg-dim);
+}
+.rr-repo:hover .rr-name {
+  text-decoration: underline;
+}
+.rr-repo:focus-visible {
+  outline: 2px solid var(--ns-focus, #3b82f6);
+  border-radius: 4px;
+}
+.rr-full {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rr-owner {
+  color: var(--fg-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rr-name {
+  font-weight: 650;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rr-meta {
+  font-size: 11.5px;
+  color: var(--fg-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ci-pill {
+  all: unset;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 30px;
+  padding: 0 13px 0 11px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  --c: var(--off);
+  color: var(--c);
+  background: color-mix(in oklab, var(--c) 14%, transparent);
+  border: 1px solid color-mix(in oklab, var(--c) 40%, transparent);
+  box-sizing: border-box;
+}
+.ci-pill:disabled {
+  cursor: default;
+}
+.ci-pill:focus-visible {
+  outline: 2px solid var(--ns-focus, #3b82f6);
+}
+.ci-branch {
+  color: var(--ns-foreground, #fff);
+  font-family: var(--ns-font-mono, ui-monospace, monospace);
+  font-weight: 500;
+  font-size: 12px;
+}
+.ci-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--c);
+  box-shadow: 0 0 10px var(--c);
+}
+.ci-success {
+  --c: var(--ok);
+}
+.ci-failure {
+  --c: var(--bad);
+}
+.ci-pending {
+  --c: var(--run);
+}
+.ci-none {
+  --c: var(--off);
+}
+.ci-pill.ci-failure {
+  animation: alarm 1.8s ease-in-out infinite;
+}
+.ci-pill.ci-pending .ci-dot {
+  animation: blink 1.1s ease-in-out infinite;
+}
+@keyframes alarm {
+  50% {
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--bad) 18%, transparent);
+  }
+}
+@keyframes blink {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.rr-refresh {
+  all: unset;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--fg-dim);
+}
+.rr-refresh:hover {
+  background: var(--ns-surface-secondary, #1f1f23);
+  color: var(--ns-foreground, #fff);
+}
+.rr-refresh:focus-visible {
+  outline: 2px solid var(--ns-focus, #3b82f6);
+}
+.rr-refresh.is-spinning svg {
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.rr-banner {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  background: var(--ns-danger-soft, color-mix(in oklab, var(--bad) 15%, transparent));
+  color: var(--ns-foreground, #fff);
+}
+.rr-banner strong {
+  color: var(--bad);
+  font-weight: 600;
+}
+.rr-banner span {
+  color: var(--fg-dim);
+}
+
+.rr-read {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px 3px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  color: var(--ns-accent-soft-foreground, #93c5fd);
+  background: var(--ns-accent-soft, color-mix(in oklab, #3b82f6 18%, transparent));
+  animation: fade-in 300ms ease-out, fade-out 600ms ease-in 9.4s forwards;
+}
+.rr-read-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 8px currentColor;
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+/* --- body ---------------------------------------------------------------------------- */
+
+.rr-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.rr-body h2 {
+  margin: 0 0 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--fg-dim);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.rr-count {
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--ns-surface-secondary, #1f1f23);
+  color: var(--ns-foreground, #fff);
+  letter-spacing: 0;
+}
+.rr-none {
+  margin: 4px 0;
+  font-size: 12.5px;
+  color: var(--fg-dim);
+}
+
+.rr-pulls {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.rr-list {
+  list-style: none;
+  margin: 0 0 0 -8px;
+  padding: 0 0 0 8px;
+  overflow-y: auto;
+  min-height: 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ns-default, #3f3f46) transparent;
+}
+
+.pr {
+  position: relative;
+  border-top: 1px solid var(--line);
+}
+.pr:first-child {
+  border-top: 0;
+}
+.pr-btn,
+.run-btn {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  padding: 7px 4px;
+  border-radius: 6px;
+}
+.pr-btn:hover,
+.run-btn:hover {
+  background: color-mix(in oklab, var(--ns-surface-secondary, #1f1f23) 70%, transparent);
+}
+.pr-btn:focus-visible,
+.run-btn:focus-visible {
+  outline: 2px solid var(--ns-focus, #3b82f6);
+}
+.pr-ci {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  margin-top: 5px;
+  border-radius: 50%;
+  background: var(--c);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--c) 18%, transparent);
+}
+.pr.ci-none .pr-ci,
+.run.ci-none .pr-ci {
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px var(--off);
+}
+.pr.ci-pending .pr-ci,
+.run.ci-pending .pr-ci {
+  animation: blink 1.1s ease-in-out infinite;
+}
+.pr-main {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  flex: 1;
+}
+.pr-title {
+  font-size: 13px;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pr.is-draft .pr-title {
+  color: var(--fg-dim);
+}
+.pr-num {
+  color: var(--fg-dim);
+  font-variant-numeric: tabular-nums;
+}
+.pr-meta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  font-size: 11px;
+  color: var(--fg-dim);
+  white-space: nowrap;
+  overflow: hidden;
+}
+.pr-sub {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.chip {
+  flex: none;
+  padding: 0 6px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  line-height: 16px;
+}
+.chip-draft {
+  border: 1px solid var(--line);
+}
+.chip-label {
+  color: color-mix(in oklab, var(--lc) 70%, white);
+  background: color-mix(in oklab, var(--lc) 20%, transparent);
+  border: 1px solid color-mix(in oklab, var(--lc) 45%, transparent);
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pr.is-new::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--ns-accent, #3b82f6);
+  box-shadow: 0 0 8px var(--ns-accent, #3b82f6);
+}
+.row-flash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: 6px;
+  background: linear-gradient(90deg, color-mix(in oklab, var(--ns-accent, #3b82f6) 22%, transparent), transparent 70%);
+  animation: fade-out 2.4s ease-out forwards;
+}
+
+.rr-runs {
+  flex: none;
+}
+.run-strip {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+.run-dot {
+  all: unset;
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+  border-radius: 5px;
+  background: color-mix(in oklab, var(--c) 80%, transparent);
+  box-shadow: 0 0 8px color-mix(in oklab, var(--c) 35%, transparent);
+}
+.run-dot.ci-pending {
+  animation: blink 1.1s ease-in-out infinite;
+}
+.run-dot:focus-visible {
+  outline: 2px solid var(--ns-focus, #3b82f6);
+  outline-offset: 2px;
+}
+.run-dot.is-new {
+  outline: 2px solid var(--ns-foreground, #fff);
+  outline-offset: 2px;
+}
+.run-list {
+  display: none;
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+}
+.run-btn {
+  align-items: center;
+  padding: 5px 4px;
+  font-size: 12px;
+}
+.run-btn .pr-ci {
+  margin-top: 0;
+}
+.run-name {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.run-sha {
+  font-family: var(--ns-font-mono, ui-monospace, monospace);
+  font-size: 11px;
+  color: var(--fg-dim);
+}
+.run-when {
+  font-size: 11px;
+  color: var(--fg-dim);
+  white-space: nowrap;
+}
+
+.rr-foot {
+  flex: none;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 11px;
+  color: var(--fg-dim);
+  white-space: nowrap;
+  overflow: hidden;
+}
+.rr-foot > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rr-low {
+  color: var(--run);
+}
+
+/* --- states --------------------------------------------------------------------------- */
+
+.radar--state {
+  display: grid;
+  place-items: center;
+}
+.rr-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+  width: min(360px, 100%);
+}
+.rr-glyph {
+  color: var(--ns-accent, #3b82f6);
+  filter: drop-shadow(0 0 12px color-mix(in oklab, var(--ns-accent, #3b82f6) 50%, transparent));
+}
+.rr-glyph--danger {
+  color: var(--bad);
+  filter: none;
+}
+.rr-sweep {
+  transform-origin: 48px 48px;
+  animation: spin 3.2s linear infinite;
+}
+.rr-glyph--danger .rr-sweep {
+  animation: none;
+}
+.rr-state-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+.rr-state-body {
+  margin: 0 0 4px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--fg-dim);
+  word-break: break-word;
+}
+.rr-field {
+  display: flex;
+  gap: 6px;
+  width: 100%;
+}
+.rr-field .ns-input {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--ns-font-mono, ui-monospace, monospace);
+}
+.rr-field .ns-input[aria-invalid] {
+  border-color: var(--bad);
+}
+.rr-invalid {
+  margin: 0;
+  font-size: 11.5px;
+  color: var(--bad);
+}
+.rr-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.skel,
+.skel-line {
+  position: relative;
+  overflow: hidden;
+  border-radius: 6px;
+  background: var(--ns-surface-secondary, #1f1f23);
+  border-color: transparent;
+}
+.skel-line {
+  display: block;
+  height: 10px;
+}
+.skel-line--thin {
+  height: 7px;
+  margin-top: 6px;
+}
+.skel-row {
+  padding: 10px 4px;
+}
+.skel::after,
+.skel-line::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, color-mix(in oklab, var(--ns-foreground, #fff) 7%, transparent), transparent);
+  animation: shimmer 1.4s infinite;
+}
+@keyframes shimmer {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+/* --- sizes ------------------------------------------------------------------------------ */
+
+/* Wide: pull requests left, runs (with names) right. */
+@container radar (min-width: 760px) {
+  .rr-body {
+    flex-direction: row;
+    gap: 20px;
+  }
+  .rr-pulls {
+    flex: 1.6;
+  }
+  .rr-runs {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    padding-left: 20px;
+    border-left: 1px solid var(--line);
+  }
+  .run-list {
+    display: block;
+  }
+  .ci-pill {
+    height: 34px;
+    font-size: 14px;
+  }
+}
+
+@container radar (max-width: 420px) {
+  .rr-foot > span + span {
+    display: none;
+  }
+  .chip-label {
+    display: none;
+  }
+}
+
+/* Small: the CI pill and the counts. */
+@container radar (max-width: 330px) {
+  .radar {
+    padding: 10px;
+    justify-content: center;
+  }
+  .rr-head {
+    flex-wrap: wrap;
+  }
+  .rr-refresh,
+  .rr-body,
+  .rr-banner,
+  .rr-read {
+    display: none;
+  }
+  .rr-id {
+    flex-basis: 100%;
+  }
+}
+@container radar (max-height: 230px) {
+  .rr-body,
+  .rr-read {
+    display: none;
+  }
+  .radar {
+    justify-content: space-between;
+  }
+}
