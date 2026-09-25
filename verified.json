@@ -23,8 +23,8 @@
       "repo": "glmn-ai/neurosquad-cards",
       "path": "official-cards/agent-pulse",
       "version": "1.0.0",
-      "commit": "69f824b766c14a997a860aaa0a02be5d197fd636",
-      "treeHash": "6dd49f1020b872c439d50439cf0904697e8a48ddcf8635bd5118c1c3b924d7b5",
+      "commit": "87fa9c29af89594ca64f2278036c659d47ea19d3",
+      "treeHash": "4663ac4db93b69b2b89f32d530ac82df610ef414bc52db48d940ddf7b852e422",
       "permissions": [
         "agents.read"
       ],
@@ -71,8 +71,8 @@
       "repo": "glmn-ai/neurosquad-cards",
       "path": "official-cards/decision-log",
       "version": "1.0.0",
-      "commit": "69f824b766c14a997a860aaa0a02be5d197fd636",
-      "treeHash": "522062ac588ed1cb1696cb62511b22431e707b6a88c78663879b5c4b4edbef6a",
+      "commit": "87fa9c29af89594ca64f2278036c659d47ea19d3",
+      "treeHash": "dc3d25c5597ebeda74a39fb270710c13c552914fc3d6eb8a60f601bf4f04d068",
       "permissions": [],
       "optionalPermissions": [
         "cards.connected",
@@ -119,8 +119,8 @@
       "repo": "glmn-ai/neurosquad-cards",
       "path": "official-cards/launch-control",
       "version": "1.0.0",
-      "commit": "69f824b766c14a997a860aaa0a02be5d197fd636",
-      "treeHash": "d29507159a9cc1c37aa506d7046fe28a4a585bf1f205cca77be691b9add31b48",
+      "commit": "87fa9c29af89594ca64f2278036c659d47ea19d3",
+      "treeHash": "6a79af7c5e46fd022cbb2ec1dfd16f1f689f8b9d40f89504df961623563e351f",
       "permissions": [],
       "optionalPermissions": [
         "cards.connected"
@@ -166,8 +166,8 @@
       "repo": "glmn-ai/neurosquad-cards",
       "path": "official-cards/repo-radar",
       "version": "1.0.0",
-      "commit": "69f824b766c14a997a860aaa0a02be5d197fd636",
-      "treeHash": "8baa18743d469f342944baa708fba0b47713069ae37d34aeb0cc1cff7e28cb95",
+      "commit": "87fa9c29af89594ca64f2278036c659d47ea19d3",
+      "treeHash": "2abad5691e5b273c77b75c559b49c5271e1b68217fd6980cdf220073eff0ffe4",
       "permissions": [
         "network"
       ],
@@ -216,8 +216,8 @@
       "repo": "glmn-ai/neurosquad-cards",
       "path": "official-cards/signal-router",
       "version": "1.0.0",
-      "commit": "69f824b766c14a997a860aaa0a02be5d197fd636",
-      "treeHash": "c9407215f49c87fa99d3535191547b15ef37f6455d3ac091fbc5888f4d4d8e22",
+      "commit": "87fa9c29af89594ca64f2278036c659d47ea19d3",
+      "treeHash": "1ead6b4584e97ee6d627d601e625b416c6319c548d7e2029ae8fd9cca8081538",
       "permissions": [],
       "optionalPermissions": [
         "agents.prompt",
