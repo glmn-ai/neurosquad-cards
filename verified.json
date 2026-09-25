@@ -1,6 +1,248 @@
 {
   "$schema": "./verified.schema.json",
   "schemaVersion": 1,
-  "updatedAt": "2026-09-25T00:00:00Z",
-  "cards": []
+  "updatedAt": "2026-09-25T12:00:00Z",
+  "cards": [
+    {
+      "id": "agent-pulse",
+      "packageId": "agent-pulse",
+      "name": {
+        "en": "Agent Pulse",
+        "ru": "Пульс агентов",
+        "zh": "智能体脉搏"
+      },
+      "description": {
+        "en": "A live pulse of every agent on the canvas: status timelines, turn durations, and how long each one has been waiting for you.",
+        "ru": "Живой пульс всех агентов на холсте: шкалы статусов, длительность ходов и сколько каждый ждёт вашего ответа.",
+        "zh": "画布上所有智能体的实时脉搏：状态时间线、每轮耗时，以及每个智能体等了你多久。"
+      },
+      "author": {
+        "name": "NeuroSquad examples",
+        "github": "glmn-ai"
+      },
+      "repo": "glmn-ai/neurosquad-cards",
+      "path": "official-cards/agent-pulse",
+      "version": "1.0.0",
+      "commit": "69f824b766c14a997a860aaa0a02be5d197fd636",
+      "treeHash": "6dd49f1020b872c439d50439cf0904697e8a48ddcf8635bd5118c1c3b924d7b5",
+      "permissions": [
+        "agents.read"
+      ],
+      "optionalPermissions": [
+        "cards.connected"
+      ],
+      "tags": [
+        "agents",
+        "dashboard",
+        "timeline",
+        "monitoring"
+      ],
+      "category": "agents",
+      "license": "MIT",
+      "homepage": "https://github.com/glmn-ai/neurosquad-cards/tree/main/official-cards/agent-pulse",
+      "icon": "icon.png",
+      "screenshots": [
+        "docs/screenshot.png",
+        "docs/states.png"
+      ],
+      "minAppVersion": "0.1.123",
+      "official": true,
+      "verifiedAt": "2026-09-25",
+      "reviewer": "glmn-ai",
+      "notes": "Reads agent status only (agents.read), never agent output. No network, no files."
+    },
+    {
+      "id": "decision-log",
+      "packageId": "decision-log",
+      "name": {
+        "en": "Decision Log",
+        "ru": "Журнал решений",
+        "zh": "决策日志"
+      },
+      "description": {
+        "en": "Agents record architecture decisions here over MCP; you search, review, accept or reject them, and export them as ADR files.",
+        "ru": "Агенты записывают сюда архитектурные решения через MCP; вы ищете, проверяете, принимаете или отклоняете их и выгружаете как файлы ADR.",
+        "zh": "智能体通过 MCP 在这里记录架构决策；你可以搜索、审阅、接受或拒绝，并导出为 ADR 文件。"
+      },
+      "author": {
+        "name": "NeuroSquad examples",
+        "github": "glmn-ai"
+      },
+      "repo": "glmn-ai/neurosquad-cards",
+      "path": "official-cards/decision-log",
+      "version": "1.0.0",
+      "commit": "69f824b766c14a997a860aaa0a02be5d197fd636",
+      "treeHash": "522062ac588ed1cb1696cb62511b22431e707b6a88c78663879b5c4b4edbef6a",
+      "permissions": [],
+      "optionalPermissions": [
+        "cards.connected",
+        "fs.write"
+      ],
+      "tags": [
+        "adr",
+        "decisions",
+        "mcp",
+        "review",
+        "documentation"
+      ],
+      "category": "dev-tools",
+      "license": "MIT",
+      "homepage": "https://github.com/glmn-ai/neurosquad-cards/tree/main/official-cards/decision-log",
+      "icon": "icon.png",
+      "screenshots": [
+        "docs/screenshot.png",
+        "docs/states.png"
+      ],
+      "minAppVersion": "0.1.123",
+      "official": true,
+      "verifiedAt": "2026-09-25",
+      "reviewer": "glmn-ai",
+      "notes": "Agents write decisions over MCP tools; fs.write is optional and used only for the explicit \"Export as ADR files\" action (docs/adr/*.md)."
+    },
+    {
+      "id": "launch-control",
+      "packageId": "launch-control",
+      "name": {
+        "en": "Launch Control",
+        "ru": "Центр запуска",
+        "zh": "发射控制"
+      },
+      "description": {
+        "en": "A mission-control Go/No-Go board for releases: a countdown, launch checks your agents can set, and a GO signal when everything is green.",
+        "ru": "Пульт Go/No-Go для релизов: обратный отсчёт, проверки, которые ставят ваши агенты, и сигнал GO, когда всё зелёное.",
+        "zh": "用于发布的任务控制 Go/No-Go 面板：倒计时、智能体可以设置的发射检查项，全部通过时发出 GO 信号。"
+      },
+      "author": {
+        "name": "NeuroSquad examples",
+        "github": "glmn-ai"
+      },
+      "repo": "glmn-ai/neurosquad-cards",
+      "path": "official-cards/launch-control",
+      "version": "1.0.0",
+      "commit": "69f824b766c14a997a860aaa0a02be5d197fd636",
+      "treeHash": "d29507159a9cc1c37aa506d7046fe28a4a585bf1f205cca77be691b9add31b48",
+      "permissions": [],
+      "optionalPermissions": [
+        "cards.connected"
+      ],
+      "tags": [
+        "release",
+        "checklist",
+        "countdown",
+        "go-no-go"
+      ],
+      "category": "productivity",
+      "license": "MIT",
+      "homepage": "https://github.com/glmn-ai/neurosquad-cards/tree/main/official-cards/launch-control",
+      "icon": "icon.png",
+      "screenshots": [
+        "docs/screenshot.png",
+        "docs/skins.png",
+        "docs/states.png"
+      ],
+      "minAppVersion": "0.1.123",
+      "official": true,
+      "verifiedAt": "2026-09-25",
+      "reviewer": "glmn-ai",
+      "notes": "No required permissions; cards.connected is optional, only for sending the status report into a connected built-in card."
+    },
+    {
+      "id": "repo-radar",
+      "packageId": "repo-radar",
+      "name": {
+        "en": "Repo Radar",
+        "ru": "Радар репозитория",
+        "zh": "仓库雷达"
+      },
+      "description": {
+        "en": "Open pull requests and CI of a GitHub repository on the canvas. Agents can check CI after they push.",
+        "ru": "Открытые пулл-реквесты и CI репозитория GitHub прямо на холсте. Агенты могут проверить CI после пуша.",
+        "zh": "在画布上查看 GitHub 仓库的未合并拉取请求和 CI。智能体推送后可以查询 CI 状态。"
+      },
+      "author": {
+        "name": "NeuroSquad examples",
+        "github": "glmn-ai"
+      },
+      "repo": "glmn-ai/neurosquad-cards",
+      "path": "official-cards/repo-radar",
+      "version": "1.0.0",
+      "commit": "69f824b766c14a997a860aaa0a02be5d197fd636",
+      "treeHash": "8baa18743d469f342944baa708fba0b47713069ae37d34aeb0cc1cff7e28cb95",
+      "permissions": [
+        "network"
+      ],
+      "optionalPermissions": [
+        "fs.read"
+      ],
+      "networkHosts": [
+        "api.github.com"
+      ],
+      "tags": [
+        "github",
+        "ci",
+        "pull-requests"
+      ],
+      "category": "dev-tools",
+      "license": "MIT",
+      "homepage": "https://github.com/glmn-ai/neurosquad-cards/tree/main/official-cards/repo-radar",
+      "icon": "icon.png",
+      "screenshots": [
+        "docs/screenshot.png",
+        "docs/states.png"
+      ],
+      "minAppVersion": "0.1.123",
+      "official": true,
+      "verifiedAt": "2026-09-25",
+      "reviewer": "glmn-ai",
+      "notes": "Talks only to api.github.com, only while visible; fs.read is optional and reads .git/config only for \"Detect from this folder\"."
+    },
+    {
+      "id": "signal-router",
+      "packageId": "signal-router",
+      "name": {
+        "en": "Signal Router",
+        "ru": "Маршрутизатор сигналов",
+        "zh": "信号路由器"
+      },
+      "description": {
+        "en": "A patch bay for your canvas: takes whatever flows in over arrows, routes it to connected cards and agents by your rules, and shows every message with its shape.",
+        "ru": "Коммутатор для холста: принимает всё, что приходит по стрелкам, раскидывает по подключённым карточкам и агентам по вашим правилам и показывает каждое сообщение с его структурой.",
+        "zh": "画布上的配线架：接收箭头传来的任何数据，按你的规则转发给已连接的卡片和智能体，并展示每条消息及其结构。"
+      },
+      "author": {
+        "name": "NeuroSquad examples",
+        "github": "glmn-ai"
+      },
+      "repo": "glmn-ai/neurosquad-cards",
+      "path": "official-cards/signal-router",
+      "version": "1.0.0",
+      "commit": "69f824b766c14a997a860aaa0a02be5d197fd636",
+      "treeHash": "c9407215f49c87fa99d3535191547b15ef37f6455d3ac091fbc5888f4d4d8e22",
+      "permissions": [],
+      "optionalPermissions": [
+        "agents.prompt",
+        "cards.connected"
+      ],
+      "tags": [
+        "ports",
+        "pipeline",
+        "router",
+        "inspector",
+        "json"
+      ],
+      "category": "data",
+      "license": "MIT",
+      "homepage": "https://github.com/glmn-ai/neurosquad-cards/tree/main/official-cards/signal-router",
+      "icon": "icon.png",
+      "screenshots": [
+        "docs/screenshot.png",
+        "docs/states.png"
+      ],
+      "minAppVersion": "0.1.123",
+      "official": true,
+      "verifiedAt": "2026-09-25",
+      "reviewer": "glmn-ai",
+      "notes": "No required permissions; agents.prompt and cards.connected are optional and requested only when a rule targets them. Prompts are capped at 6 a minute per rule."
+    }
+  ]
 }

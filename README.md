@@ -73,10 +73,6 @@ catalog, or paste a source such as
 (`owner/repo[/folder][@ref]`). Review the permissions in the install dialog,
 then add the card from the canvas: **+ → Custom card…**.
 
-> While this repository is private, installing the official cards from it
-> needs a GitHub token saved in **Settings → Custom cards** (a fine-grained
-> token with read access to this repository).
-
 ## How entries are checked
 
 [`scripts/verify.mjs`](scripts/verify.mjs) runs in CI
