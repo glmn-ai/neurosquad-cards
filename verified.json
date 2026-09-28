@@ -1,7 +1,7 @@
 {
   "$schema": "./verified.schema.json",
   "schemaVersion": 1,
-  "updatedAt": "2026-09-25T12:00:00Z",
+  "updatedAt": "2026-09-28T01:50:44Z",
   "cards": [
     {
       "id": "agent-pulse",
@@ -98,6 +98,56 @@
       "verifiedAt": "2026-09-25",
       "reviewer": "glmn-ai",
       "notes": "Agents write decisions over MCP tools; fs.write is optional and used only for the explicit \"Export as ADR files\" action (docs/adr/*.md)."
+    },
+    {
+      "id": "jev-oracle",
+      "packageId": "jev-oracle",
+      "name": {
+        "en": "JEV Oracle",
+        "ru": "Оракул JEV",
+        "zh": "JEV 预言机"
+      },
+      "description": {
+        "en": "Ask TypeSafe AI's Jev model one or more typed questions and get calibrated probabilities back. Agents call it over MCP; you can also ask by hand.",
+        "ru": "Задайте модели Jev от TypeSafe AI один или несколько типизированных вопросов и получите откалиброванные вероятности. Агенты вызывают её через MCP; вы тоже можете спросить вручную.",
+        "zh": "向 TypeSafe AI 的 Jev 模型提出一个或多个类型化问题，获得经过校准的概率。智能体通过 MCP 调用它；你也可以手动提问。"
+      },
+      "author": {
+        "name": "glmn",
+        "github": "glmn"
+      },
+      "repo": "glmn/ns-jev-decider",
+      "version": "0.1.0",
+      "commit": "c2d884c0ca88f6e4d2a2bbb6f50cd0fe7258bed5",
+      "treeHash": "da487e06dddfa0ea42be843d901d1f2a53539464e2659ee92b03fade189f14d9",
+      "permissions": [
+        "network"
+      ],
+      "networkHosts": [
+        "api.typesafe.ai",
+        "openrouter.ai"
+      ],
+      "tags": [
+        "jev",
+        "typesafe",
+        "openrouter",
+        "forecasting",
+        "probability",
+        "decisions",
+        "mcp"
+      ],
+      "category": "agents",
+      "license": "MIT",
+      "homepage": "https://github.com/glmn/ns-jev-decider",
+      "icon": "icon.png",
+      "screenshots": [
+        "docs/screenshot.png",
+        "docs/states.png"
+      ],
+      "official": false,
+      "verifiedAt": "2026-09-28",
+      "reviewer": "glmn-ai",
+      "notes": "Talks only to api.typesafe.ai or openrouter.ai, and only when a question is asked (by a connected agent over the estimate tool, or by hand); nothing runs in the background. Keys are secret settings the host injects into the authorization header, never seen by the card. OpenRouter requests carry the same NeuroSquad app attribution headers as the desktop app."
     },
     {
       "id": "launch-control",
