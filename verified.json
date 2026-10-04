@@ -1,7 +1,7 @@
 {
   "$schema": "./verified.schema.json",
   "schemaVersion": 1,
-  "updatedAt": "2026-09-28T01:50:44Z",
+  "updatedAt": "2026-10-04T00:25:51Z",
   "cards": [
     {
       "id": "agent-pulse",
@@ -245,6 +245,57 @@
       "verifiedAt": "2026-09-25",
       "reviewer": "glmn-ai",
       "notes": "Talks only to api.github.com, only while visible; fs.read is optional and reads .git/config only for \"Detect from this folder\"."
+    },
+    {
+      "id": "run-stats",
+      "packageId": "run-stats",
+      "name": {
+        "en": "Run Stats",
+        "ru": "Статистика прогона",
+        "zh": "运行统计"
+      },
+      "description": {
+        "en": "One agent's run in big, exact numbers: prompts, model requests, input / output / cache tokens, elapsed and working time. Start measuring, freeze at the finish, copy the results as Markdown or JSON.",
+        "ru": "Прогон одного агента крупными точными цифрами: промпты, запросы к модели, токены ввода, вывода и кеша, общее и рабочее время. Начните замер, заморозьте на финише, скопируйте результат в Markdown или JSON.",
+        "zh": "用醒目、精确的数字呈现一个智能体的一次运行：提示数、模型请求数、输入/输出/缓存词元、总用时与工作时间。开始测量，完成时冻结，结果可复制为 Markdown 或 JSON。"
+      },
+      "author": {
+        "name": "NeuroSquad",
+        "github": "glmn-ai"
+      },
+      "repo": "glmn-ai/neurosquad-cards",
+      "path": "official-cards/run-stats",
+      "version": "1.0.0",
+      "commit": "97562066e30eee34551ca614985d85aadf1d3eca",
+      "treeHash": "049b3685a2adfaab14a272a8b9dcee9eaf9950b13766e3925eec96074c2f1916",
+      "permissions": [
+        "agents.read",
+        "usage.read"
+      ],
+      "optionalPermissions": [
+        "cards.connected",
+        "clipboard.write"
+      ],
+      "tags": [
+        "benchmark",
+        "tokens",
+        "usage",
+        "agents",
+        "metrics"
+      ],
+      "category": "agents",
+      "license": "MIT",
+      "homepage": "https://github.com/glmn-ai/neurosquad-cards/tree/main/official-cards/run-stats",
+      "icon": "icon.png",
+      "screenshots": [
+        "docs/screenshot.png",
+        "docs/states.png"
+      ],
+      "minAppVersion": "0.1.254",
+      "official": true,
+      "verifiedAt": "2026-10-04",
+      "reviewer": "glmn-ai",
+      "notes": "Reads the connected agent's token counts and timing through agents.usage (usage.read, arrow-connected agents only) and its status (agents.read). Never reads agent output. No network, no files. Clipboard and notes only on request (optional permissions)."
     },
     {
       "id": "signal-router",
