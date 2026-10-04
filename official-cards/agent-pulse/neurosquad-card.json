@@ -7,22 +7,40 @@
     "ru": "Пульс агентов",
     "zh": "智能体脉搏"
   },
-  "version": "1.0.0",
+  "version": "1.1.0",
   "protocol": 1,
   "description": {
-    "en": "A live pulse of every agent on the canvas: status timelines, turn durations, and how long each one has been waiting for you.",
-    "ru": "Живой пульс всех агентов на холсте: шкалы статусов, длительность ходов и сколько каждый ждёт вашего ответа.",
-    "zh": "画布上所有智能体的实时脉搏：状态时间线、每轮耗时，以及每个智能体等了你多久。"
+    "en": "A live pulse of your agents: every model request of the agents you connect, as bars on a shared timeline (duration, tokens, tool calls), plus status timelines, turn durations and how long each agent has been waiting for you.",
+    "ru": "Живой пульс агентов: каждый запрос к модели у подключённых агентов полосой на общей шкале времени (длительность, токены, вызовы инструментов), а также шкалы статусов, длительность ходов и сколько каждый ждёт вашего ответа.",
+    "zh": "智能体的实时脉搏：已连接智能体的每次模型请求在共享时间轴上显示为条形（耗时、词元、工具调用），以及状态时间线、每轮耗时和每个智能体等了你多久。"
   },
-  "author": { "name": "NeuroSquad examples" },
+  "author": {
+    "name": "NeuroSquad examples"
+  },
   "license": "MIT",
-  "keywords": ["agents", "dashboard", "timeline", "monitoring"],
+  "keywords": [
+    "agents",
+    "dashboard",
+    "timeline",
+    "monitoring",
+    "requests",
+    "benchmark"
+  ],
   "icon": "icon.png",
   "entry": "dist/index.html",
   "card": {
-    "defaultSize": { "w": 560, "h": 380 },
-    "minSize": { "w": 260, "h": 180 },
-    "maxSize": { "w": 1600, "h": 1200 }
+    "defaultSize": {
+      "w": 560,
+      "h": 380
+    },
+    "minSize": {
+      "w": 260,
+      "h": 180
+    },
+    "maxSize": {
+      "w": 1600,
+      "h": 1200
+    }
   },
   "permissions": [
     {
@@ -40,6 +58,15 @@
         "en": "Only if you send a report into a connected note, checklist or sticky.",
         "ru": "Только если вы отправляете отчёт в подключённую заметку, список или стикер.",
         "zh": "仅当你把报告发送到已连接的笔记、清单或便签时需要。"
+      }
+    },
+    {
+      "id": "usage.read",
+      "optional": true,
+      "reason": {
+        "en": "Only for the Requests view: reads the model requests (times, tokens, tool names) of agents connected to this card by an arrow.",
+        "ru": "Только для вида «Запросы»: читает запросы к модели (время, токены, имена инструментов) агентов, соединённых с карточкой стрелкой.",
+        "zh": "仅用于“请求”视图：读取用箭头连接到此卡片的智能体的模型请求（时间、词元、工具名称）。"
       }
     }
   ],
@@ -72,7 +99,11 @@
     "outputs": [
       {
         "id": "report",
-        "label": { "en": "Report", "ru": "Отчёт", "zh": "报告" },
+        "label": {
+          "en": "Report",
+          "ru": "Отчёт",
+          "zh": "报告"
+        },
         "description": {
           "en": "A Markdown table of every agent's status, turns and busy time — sent when you pick \"Send report\".",
           "ru": "Таблица Markdown: статус, ходы и занятость каждого агента — по пункту «Отправить отчёт».",
@@ -82,7 +113,11 @@
       },
       {
         "id": "turns",
-        "label": { "en": "Finished turns", "ru": "Завершённые ходы", "zh": "已完成的轮次" },
+        "label": {
+          "en": "Finished turns",
+          "ru": "Завершённые ходы",
+          "zh": "已完成的轮次"
+        },
         "description": {
           "en": "One event per finished turn: { type: \"turn\", data: { agent, durationMs, endedAs } }.",
           "ru": "Событие на каждый завершённый ход: { type: \"turn\", data: { agent, durationMs, endedAs } }.",

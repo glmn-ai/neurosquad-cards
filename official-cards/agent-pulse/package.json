@@ -1,8 +1,8 @@
 {
   "name": "agent-pulse",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
-  "description": "A live pulse of every agent on your NeuroSquad canvas: timelines, turn durations, who is waiting on you.",
+  "description": "A live pulse of every agent on your NeuroSquad canvas: model requests on a timeline, status timelines, turn durations, who is waiting on you.",
   "license": "MIT",
   "type": "module",
   "scripts": {
@@ -14,7 +14,7 @@
     "pack": "neurosquad-card pack"
   },
   "dependencies": {
-    "@neurosquad/card-sdk": "^1.0.0",
+    "@neurosquad/card-sdk": "file:vendor/neurosquad-card-sdk-1.2.0.tgz",
     "react": "19.2.8",
     "react-dom": "19.2.8"
   },

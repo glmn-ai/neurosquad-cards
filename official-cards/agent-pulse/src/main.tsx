@@ -7,6 +7,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { App } from './App'
 import { PulseController } from './controller'
+import { RequestsController } from './requests'
 import './styles.css'
 
 // Opened on its own (npm run dev, or dist/index.html in a browser) the card runs
@@ -17,12 +18,14 @@ const standalone =
 const card: Card = standalone ? await (await import('./preview')).previewCard() : await connect()
 
 const pulse = new PulseController(card)
+const requests = new RequestsController(card, { t: pulse.t })
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <CardProvider card={card}>
-      <App pulse={pulse} />
+      <App pulse={pulse} requests={requests} />
     </CardProvider>
   </StrictMode>
 )
 await pulse.start()
+await requests.start()
 if (standalone) (await import('./preview')).afterStart(pulse)

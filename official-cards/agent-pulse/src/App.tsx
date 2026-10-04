@@ -5,6 +5,8 @@ import { WINDOWS, type PulseController, type WindowKey } from './controller'
 import { duration, harnessLabel } from './format'
 import { catalog } from './i18n'
 import { laneBlocks, type AgentSummary } from './model'
+import type { RequestsController } from './requests'
+import { RequestsView } from './RequestsView'
 
 /** Re-renders once a second — only while someone can see the card. */
 function useNow(paused: boolean): number {
@@ -29,7 +31,53 @@ function axisLabel(ms: number, lang: 'en' | 'ru' | 'zh'): string {
   return minutes >= 120 && minutes % 60 === 0 ? `${minutes / 60}${h}` : `${minutes}${m}`
 }
 
-export function App({ pulse }: { pulse: PulseController }): React.JSX.Element {
+export type ViewKey = 'requests' | 'status'
+
+/** Two views: every model request of the arrow-connected agents (1.1), and the status timelines of all agents. */
+export function App({
+  pulse,
+  requests
+}: {
+  pulse: PulseController
+  requests: RequestsController
+}): React.JSX.Element {
+  const t = useTranslator(catalog)
+  const req = useSyncExternalStore(requests.subscribe, requests.getSnapshot)
+  const [stored, setStored] = useStorage<string>('view', '')
+  const fallback: ViewKey =
+    req.phase === 'empty' || req.phase === 'unsupported' ? 'status' : 'requests'
+  const view: ViewKey = stored === 'requests' || stored === 'status' ? stored : fallback
+  useEffect(() => {
+    pulse.overviewOwnedByRequests = view === 'requests'
+    requests.active = view === 'requests'
+  }, [view, pulse, requests])
+  return (
+    <div className="pulse-root">
+      <nav className="view-tabs" role="tablist" aria-label={t('view.label')}>
+        {(['requests', 'status'] as const).map((key) => (
+          <button
+            key={key}
+            role="tab"
+            aria-selected={view === key}
+            className={view === key ? 'is-on' : undefined}
+            onClick={() => setStored(key)}
+          >
+            {t(`view.${key}`)}
+          </button>
+        ))}
+      </nav>
+      {view === 'requests' ? (
+        <main className="pulse pulse--requests">
+          <RequestsView requests={requests} t={t} />
+        </main>
+      ) : (
+        <StatusView pulse={pulse} />
+      )}
+    </div>
+  )
+}
+
+function StatusView({ pulse }: { pulse: PulseController }): React.JSX.Element {
   const snap = useSyncExternalStore(pulse.subscribe, pulse.getSnapshot)
   const t = useTranslator(catalog)
   const paused = usePaused()
@@ -80,8 +128,18 @@ export function App({ pulse }: { pulse: PulseController }): React.JSX.Element {
     <main className="pulse" data-paused={paused || undefined}>
       <header className="pulse-head">
         <div className="kpis">
-          <Kpi tone="accent" label={t('kpi.working')} value={summary.counts.working} live={summary.counts.working > 0} />
-          <Kpi tone="warning" label={t('kpi.waiting')} value={summary.counts['needs-input']} live={summary.counts['needs-input'] > 0} />
+          <Kpi
+            tone="accent"
+            label={t('kpi.working')}
+            value={summary.counts.working}
+            live={summary.counts.working > 0}
+          />
+          <Kpi
+            tone="warning"
+            label={t('kpi.waiting')}
+            value={summary.counts['needs-input']}
+            live={summary.counts['needs-input'] > 0}
+          />
           <Kpi label={t('kpi.turns')} value={summary.turns} className="kpi--wide" />
           <Kpi
             label={t('kpi.median')}
@@ -171,7 +229,11 @@ function Kpi({
   className?: string
 }): React.JSX.Element {
   return (
-    <div className={['kpi', tone && `kpi--${tone}`, live && 'is-live', className].filter(Boolean).join(' ')}>
+    <div
+      className={['kpi', tone && `kpi--${tone}`, live && 'is-live', className]
+        .filter(Boolean)
+        .join(' ')}
+    >
       <span className="kpi-value">{value}</span>
       <span className="kpi-label">{label}</span>
     </div>

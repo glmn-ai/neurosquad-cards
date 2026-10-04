@@ -211,13 +211,23 @@ export class PulseController {
   }
 
   /** Header chip, badge and overview tile — sent only when they change. */
+  /** The Requests view is shown: it fills the overview tile itself. */
+  overviewOwnedByRequests = false
+
   private refreshChrome(): void {
     if (this.snapshot.phase !== 'ready') return
     const t = this.t
     const s = this.summary(WINDOWS['1h'])
     const { working } = s.counts
     const waiting = s.counts['needs-input']
-    const key = JSON.stringify([t.language, working, waiting, s.agents.length, s.medianTurnMs])
+    const key = JSON.stringify([
+      t.language,
+      working,
+      waiting,
+      s.agents.length,
+      s.medianTurnMs,
+      this.overviewOwnedByRequests
+    ])
     if (key === this.lastChrome) return
     this.lastChrome = key
     const card = this.card
@@ -230,6 +240,7 @@ export class PulseController {
           : null,
       { tone: waiting > 0 ? 'warning' : 'accent', busy: working > 0 }
     )
+    if (this.overviewOwnedByRequests) return
     void card.setOverview({
       primary:
         s.agents.length === 0
@@ -287,7 +298,10 @@ export class PulseController {
     void this.card
       .attention(
         'info',
-        this.t('nudge', { name: meta.name, time: duration(this.now() - open.from, this.t.language) })
+        this.t('nudge', {
+          name: meta.name,
+          time: duration(this.now() - open.from, this.t.language)
+        })
       )
       .catch(() => {}) // throttled (10 s) — the next nudge will come
   }
@@ -343,7 +357,9 @@ export class PulseController {
       '',
       t('report.summary', {
         median: s.medianTurnMs !== null ? duration(s.medianTurnMs, lang) : '—',
-        longest: s.longestTurn ? `${duration(s.longestTurn.ms, lang)} (${s.longestTurn.agent})` : '—',
+        longest: s.longestTurn
+          ? `${duration(s.longestTurn.ms, lang)} (${s.longestTurn.agent})`
+          : '—',
         waited: duration(s.waitingMs, lang)
       })
     ].join('\n')
@@ -359,7 +375,10 @@ export class PulseController {
     const needsBuiltin = card.ports.peers.some(
       (peer) =>
         peer.direction !== 'upstream' &&
-        (peer.kind === 'note' || peer.kind === 'todo' || peer.kind === 'sticky' || peer.kind === 'kanban')
+        (peer.kind === 'note' ||
+          peer.kind === 'todo' ||
+          peer.kind === 'sticky' ||
+          peer.kind === 'kanban')
     )
     if (needsBuiltin && !card.permissions.has('cards.connected')) {
       try {
@@ -419,10 +438,7 @@ export class PulseController {
     trimHistory(this.history, now)
     this.history.savedAt = now
     try {
-      await this.card.storage.set(
-        STORAGE_KEY,
-        this.history as unknown as JsonValue
-      )
+      await this.card.storage.set(STORAGE_KEY, this.history as unknown as JsonValue)
     } catch (error) {
       this.dirty = true
       this.card.log.warn('could not save the history', error)

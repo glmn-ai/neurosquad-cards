@@ -3,6 +3,54 @@ import type { Catalog } from '@neurosquad/card-sdk'
 /** The card's strings in the app's three languages (en is the fallback). */
 export const catalog: Catalog = {
   en: {
+    view: { label: 'View', requests: 'Requests', status: 'Status' },
+    requests: {
+      kpi: {
+        requests: 'Requests',
+        modelTime: 'Model time',
+        median: 'Median request',
+        longest: 'Longest'
+      },
+      window: { all: 'Run', '15m': '15m', '1h': '1h', '4h': '4h' },
+      fit: 'Fit',
+      zoomHint: 'Scroll to zoom, drag to pan',
+      legend: {
+        request: 'model request',
+        working: 'working',
+        prompt: 'prompt',
+        finished: 'finished'
+      },
+      notReported: 'not reported',
+      noStart: 'start not logged',
+      tip: { tokens: '{{input}} in · {{output}} out', cache: '{{count}} from cache' },
+      lane: {
+        requests_one: '{{count}} request',
+        requests_other: '{{count}} requests',
+        model: '{{time}} model',
+        median: 'median {{time}}',
+        longest: 'max {{time}}',
+        endOnly: 'completion times only',
+        none: 'no usage log'
+      },
+      overview: {
+        primary: '{{count}} requests · median {{median}}',
+        secondary: 'Longest request {{time}}'
+      },
+      unsupported: {
+        title: 'Update NeuroSquad',
+        body: 'The request timeline needs NeuroSquad 0.1.257 or newer. The Status view works.'
+      },
+      empty: {
+        title: 'Connect agents',
+        body: 'Draw arrows between this card and the agents to compare — every model request of each shows up on its own lane.'
+      },
+      permission: {
+        title: 'Allow token data',
+        body: 'The request timeline reads the connected agents’ requests and tokens (optional "usage" permission).',
+        allow: 'Allow'
+      },
+      error: { title: 'Could not read the requests' }
+    },
     kpi: {
       working: 'Working',
       waiting: 'Waiting on you',
@@ -73,6 +121,56 @@ export const catalog: Catalog = {
     ago: 'now'
   },
   ru: {
+    view: { label: 'Вид', requests: 'Запросы', status: 'Статусы' },
+    requests: {
+      kpi: {
+        requests: 'Запросов',
+        modelTime: 'Время модели',
+        median: 'Медиана запроса',
+        longest: 'Самый долгий'
+      },
+      window: { all: 'Прогон', '15m': '15 мин', '1h': '1 ч', '4h': '4 ч' },
+      fit: 'Вписать',
+      zoomHint: 'Колесо — масштаб, перетаскивание — сдвиг',
+      legend: {
+        request: 'запрос к модели',
+        working: 'работает',
+        prompt: 'промпт',
+        finished: 'закончил'
+      },
+      notReported: 'не сообщается',
+      noStart: 'начало не записано',
+      tip: { tokens: '{{input}} ввод · {{output}} вывод', cache: '{{count}} из кеша' },
+      lane: {
+        requests_one: '{{count}} запрос',
+        requests_few: '{{count}} запроса',
+        requests_many: '{{count}} запросов',
+        requests_other: '{{count}} запроса',
+        model: 'модель {{time}}',
+        median: 'медиана {{time}}',
+        longest: 'макс. {{time}}',
+        endOnly: 'только время завершения',
+        none: 'нет журнала расхода'
+      },
+      overview: {
+        primary: '{{count}} запр. · медиана {{median}}',
+        secondary: 'Самый долгий запрос {{time}}'
+      },
+      unsupported: {
+        title: 'Обновите NeuroSquad',
+        body: 'Для шкалы запросов нужен NeuroSquad 0.1.257 или новее. Вид «Статусы» работает.'
+      },
+      empty: {
+        title: 'Подключите агентов',
+        body: 'Проведите стрелки между этой карточкой и агентами, которых хотите сравнить, — каждый запрос к модели появится на дорожке своего агента.'
+      },
+      permission: {
+        title: 'Разрешите данные о токенах',
+        body: 'Шкала запросов читает запросы и токены подключённых агентов (необязательное разрешение «расход»).',
+        allow: 'Разрешить'
+      },
+      error: { title: 'Не удалось прочитать запросы' }
+    },
     kpi: {
       working: 'Работают',
       waiting: 'Ждут вас',
@@ -153,6 +251,40 @@ export const catalog: Catalog = {
     ago: 'сейчас'
   },
   zh: {
+    view: { label: '视图', requests: '请求', status: '状态' },
+    requests: {
+      kpi: { requests: '请求', modelTime: '模型时间', median: '请求中位数', longest: '最长' },
+      window: { all: '本次运行', '15m': '15分', '1h': '1时', '4h': '4时' },
+      fit: '适配',
+      zoomHint: '滚轮缩放，拖动平移',
+      legend: { request: '模型请求', working: '工作中', prompt: '提示', finished: '已完成' },
+      notReported: '未报告',
+      noStart: '未记录开始时间',
+      tip: { tokens: '输入 {{input}} · 输出 {{output}}', cache: '{{count}} 来自缓存' },
+      lane: {
+        requests_other: '{{count}} 次请求',
+        model: '模型 {{time}}',
+        median: '中位 {{time}}',
+        longest: '最长 {{time}}',
+        endOnly: '仅有完成时间',
+        none: '无用量日志'
+      },
+      overview: { primary: '{{count}} 次请求 · 中位 {{median}}', secondary: '最长请求 {{time}}' },
+      unsupported: {
+        title: '请更新 NeuroSquad',
+        body: '请求时间线需要 NeuroSquad 0.1.257 或更高版本。“状态”视图可正常使用。'
+      },
+      empty: {
+        title: '连接智能体',
+        body: '在此卡片与要比较的智能体之间画箭头——每个智能体的每次模型请求都会显示在它自己的泳道上。'
+      },
+      permission: {
+        title: '允许读取词元数据',
+        body: '请求时间线会读取已连接智能体的请求和词元（可选的“用量”权限）。',
+        allow: '允许'
+      },
+      error: { title: '无法读取请求' }
+    },
     kpi: {
       working: '工作中',
       waiting: '等你回复',

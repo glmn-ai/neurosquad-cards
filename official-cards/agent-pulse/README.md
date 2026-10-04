@@ -4,6 +4,33 @@ A live pulse of every agent on your [NeuroSquad](https://neurosquad.ai) canvas:
 a status timeline per agent, turn counts and durations, and — the number people
 remember — **how long agents have been waiting for you**.
 
+## Requests (new in 1.1)
+
+![Three CLIs, one model, one prompt each — every model request as a bar](docs/requests.png)
+
+Draw arrows between the card and the agents you want to compare (say Claude
+Code, OpenCode and Codex running the same prompt on the same model): each gets
+a **swimlane on a shared time axis**, and **every model request is a bar** from
+the moment it was sent to the moment its response completed.
+
+- Bar length = how long the request took; bar height = its output tokens.
+  Hover or focus a bar: duration, model, input / output / cache tokens and the
+  tool calls the model asked for.
+- Faint band = the agent was working (amber: waiting for you); ▼ = a prompt;
+  green line = finished.
+- Per lane: requests, total model time, median and longest request. KPIs over
+  all lanes; the overview tile shows requests · median request.
+- **Run** fits the whole run (sequential or simultaneous agents — lanes simply
+  sit where their requests are in time); 15m / 1h / 4h follow the clock.
+  Expanded: scroll to zoom, drag to pan, **Fit** to reset.
+- Requests come from each harness's own log through NeuroSquad's
+  `agents.timeline` (Card SDK 1.2, NeuroSquad 0.1.257+). Harnesses whose log
+  records only when a response completed (Hermes, Droid, Goose, aider, Auggie)
+  show ticks instead of bars; Amp and Cursor keep no usage log. Needs the
+  optional `usage.read` permission — the card asks the first time.
+
+## Status (1.0)
+
 ![Agent Pulse on a busy afternoon](docs/screenshot.png)
 
 - **Timeline lanes** for the last 15 minutes, hour or 4 hours: working (blue),
@@ -29,6 +56,7 @@ remember — **how long agents have been waiting for you**.
 | Permission | Required | Why |
 | --- | --- | --- |
 | `agents.read` | yes | Agent names, harness and status (working / waiting / finished). That is all the timeline needs. The card **never** reads what agents print, and it cannot prompt them. |
+| `usage.read` | optional | Only for the Requests view: the model requests (times, tokens, tool names) of agents connected to the card by an arrow. Asked when you open the view. |
 | `cards.connected` | optional | Asked only when you send a report into a connected built-in note, checklist or sticky. Sending to another custom card needs nothing. |
 
 No network, no files, no clipboard. History (at most a day) is kept in the
@@ -52,14 +80,16 @@ npm run validate   # the app's own checks + the install dialog preview
 npm run pack       # what would be installed, and the tree hash
 ```
 
-Preview states: `?state=filled|empty|loading|error|updated&lang=en|ru|zh&live=0`.
+Preview states: `?state=filled|empty|loading|error|updated|requests|requests-live&lang=en|ru|zh&live=0`.
 In the app: **Settings → Custom cards → Developer mode**, then
 `npx neurosquad-card dev`.
 
 ### The SDK dependency
 
-The card depends on [`@neurosquad/card-sdk`](https://www.npmjs.com/package/@neurosquad/card-sdk)
-from npm (`^1.0.0`). `dist/` is committed on purpose: NeuroSquad installs the
+The card is built against [`@neurosquad/card-sdk`](https://www.npmjs.com/package/@neurosquad/card-sdk)
+1.2.0, vendored as `vendor/neurosquad-card-sdk-1.2.0.tgz` until that version is on
+npm (it is `npm pack` of `packages/card-sdk` at the NeuroSquad commit that added
+`agents.timeline`). On an older app the Requests view says so; Status works. `dist/` is committed on purpose: NeuroSquad installs the
 repository as it is and never runs a build, so rebuild and commit `dist/`
 together with every source change.
 

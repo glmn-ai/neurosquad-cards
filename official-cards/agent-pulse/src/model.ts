@@ -54,7 +54,8 @@ export function emptyHistory(now: number): PulseHistory {
  * more honest than a bar that pretends to know.
  */
 export function restoreHistory(raw: unknown, now: number): PulseHistory {
-  if (!raw || typeof raw !== 'object' || (raw as PulseHistory).version !== 1) return emptyHistory(now)
+  if (!raw || typeof raw !== 'object' || (raw as PulseHistory).version !== 1)
+    return emptyHistory(now)
   const history = structuredClone(raw) as PulseHistory
   const closedAt = Math.min(history.savedAt ?? now, now)
   for (const list of Object.values(history.segments)) {
@@ -280,9 +281,7 @@ export function summarize(
     idle: 3,
     exited: 4
   }
-  agents.sort(
-    (a, b) => order[a.status] - order[b.status] || a.meta.name.localeCompare(b.meta.name)
-  )
+  agents.sort((a, b) => order[a.status] - order[b.status] || a.meta.name.localeCompare(b.meta.name))
   let longestTurn: PulseSummary['longestTurn'] = null
   for (const turn of windowTurns) {
     const ms = turn.end - turn.start
