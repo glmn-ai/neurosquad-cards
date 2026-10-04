@@ -26,6 +26,7 @@ official-cards/          NeuroSquad's own cards (source + committed dist/)
   decision-log/          ADR-style decisions agents record over MCP
   launch-control/        a Go/No-Go release board with a countdown
   repo-radar/            GitHub pull requests and CI on the canvas
+  run-stats/             one agent's run in exact numbers (prompts, requests, tokens, time)
   signal-router/         routes messages between cards by rules, with an inspector
 docs/SUBMITTING.md       how to add or update a card (English)
 docs/SUBMITTING.ru.md    то же по-русски

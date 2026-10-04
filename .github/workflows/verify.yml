@@ -54,7 +54,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        card: [agent-pulse, decision-log, launch-control, repo-radar, signal-router]
+        card: [agent-pulse, decision-log, launch-control, repo-radar, run-stats, signal-router]
     defaults:
       run:
         working-directory: official-cards/${{ matrix.card }}

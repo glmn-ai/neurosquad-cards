@@ -1,0 +1,91 @@
+{
+  "$schema": "./node_modules/@neurosquad/card-sdk/schema/neurosquad-card.v1.json",
+  "manifestVersion": 1,
+  "name": "run-stats",
+  "displayName": {
+    "en": "Run Stats",
+    "ru": "Статистика прогона",
+    "zh": "运行统计"
+  },
+  "version": "1.0.0",
+  "protocol": 1,
+  "minAppVersion": "0.1.254",
+  "description": {
+    "en": "One agent's run in big, exact numbers: prompts, model requests, input / output / cache tokens, elapsed and working time. Start measuring, freeze at the finish, copy the results as Markdown or JSON.",
+    "ru": "Прогон одного агента крупными точными цифрами: промпты, запросы к модели, токены ввода, вывода и кеша, общее и рабочее время. Начните замер, заморозьте на финише, скопируйте результат в Markdown или JSON.",
+    "zh": "用醒目、精确的数字呈现一个智能体的一次运行：提示数、模型请求数、输入/输出/缓存词元、总用时与工作时间。开始测量，完成时冻结，结果可复制为 Markdown 或 JSON。"
+  },
+  "author": { "name": "NeuroSquad", "url": "https://neurosquad.ai" },
+  "homepage": "https://github.com/glmn-ai/neurosquad-cards/tree/main/official-cards/run-stats",
+  "license": "MIT",
+  "keywords": ["benchmark", "tokens", "usage", "agents", "metrics"],
+  "icon": "icon.png",
+  "entry": "dist/index.html",
+  "card": {
+    "defaultSize": { "w": 520, "h": 420 },
+    "minSize": { "w": 240, "h": 170 },
+    "maxSize": { "w": 1400, "h": 1100 }
+  },
+  "permissions": [
+    {
+      "id": "agents.read",
+      "reason": {
+        "en": "Finds the agent you connect with an arrow and shows its name, tool and status. It never reads what the agent prints.",
+        "ru": "Находит агента, которого вы подключили стрелкой, и показывает его имя, инструмент и статус. Вывод агента не читает.",
+        "zh": "找到你用箭头连接的智能体，显示其名称、工具和状态。从不读取智能体的输出。"
+      }
+    },
+    {
+      "id": "usage.read",
+      "reason": {
+        "en": "Reads the token counts and timing of the connected agent's run — only agents connected to this card by an arrow.",
+        "ru": "Читает токены и тайминг прогона подключённого агента — только агентов, соединённых с этой карточкой стрелкой.",
+        "zh": "读取已连接智能体本次运行的词元数和用时——仅限用箭头连接到此卡片的智能体。"
+      }
+    },
+    {
+      "id": "clipboard.write",
+      "optional": true,
+      "reason": {
+        "en": "Only when you press Copy: puts the results on your clipboard as Markdown or JSON.",
+        "ru": "Только когда вы нажимаете «Копировать»: кладёт результаты в буфер обмена как Markdown или JSON.",
+        "zh": "仅在你点击“复制”时：将结果以 Markdown 或 JSON 放入剪贴板。"
+      }
+    },
+    {
+      "id": "cards.connected",
+      "optional": true,
+      "reason": {
+        "en": "Only if you send the results into a note connected by an arrow.",
+        "ru": "Только если вы отправляете результаты в заметку, подключённую стрелкой.",
+        "zh": "仅当你把结果发送到用箭头连接的笔记时需要。"
+      }
+    }
+  ],
+  "settings": [
+    {
+      "key": "freezeOnFinish",
+      "type": "boolean",
+      "label": {
+        "en": "Freeze the numbers when the agent finishes",
+        "ru": "Замораживать цифры, когда агент закончил",
+        "zh": "智能体完成时冻结数字"
+      },
+      "default": true
+    }
+  ],
+  "ports": {
+    "outputs": [
+      {
+        "id": "results",
+        "label": { "en": "Results", "ru": "Результаты", "zh": "结果" },
+        "description": {
+          "en": "The run's numbers as a Markdown table — sent when you pick \"Send to note\" (and on freeze, when a note is connected).",
+          "ru": "Цифры прогона таблицей Markdown — по пункту «Отправить в заметку» (и при заморозке, если заметка подключена).",
+          "zh": "本次运行数据的 Markdown 表格——选择“发送到笔记”时发送（若已连接笔记，冻结时也会发送）。"
+        },
+        "type": "ns:markdown"
+      }
+    ]
+  }
+}

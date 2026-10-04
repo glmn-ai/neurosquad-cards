@@ -1,0 +1,568 @@
+/* Run Stats — on top of the SDK kit's --ns-* theme variables (they follow the app theme). */
+:root {
+  --c-live: var(--ns-accent, #3b82f6);
+  --c-wait: var(--ns-warning, #f5a524);
+  --c-done: var(--ns-success, #17c964);
+  --c-idle: color-mix(in oklab, var(--ns-muted, #71717a) 70%, transparent);
+  --c-stop: var(--ns-danger, #f31260);
+  --c-input: var(--ns-accent, #3b82f6);
+  --c-output: #a78bfa;
+  --c-cache-read: #22d3ee;
+  --c-cache-write: #f59e0b;
+  --line: color-mix(in oklab, var(--ns-border, #27272a) 80%, transparent);
+  --tile: color-mix(in oklab, var(--ns-surface, #18181b) 88%, transparent);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: var(--ns-background, #0b0b0d);
+  color: var(--ns-foreground, #ececec);
+  font-family: var(--ns-font-sans, system-ui, sans-serif);
+}
+
+#root {
+  container: rs / size;
+}
+
+.rs {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px 10px;
+  gap: 10px;
+  overflow: hidden auto;
+  background:
+    radial-gradient(90% 70% at 0% 0%, color-mix(in oklab, var(--c-live) 12%, transparent), transparent 62%),
+    radial-gradient(70% 60% at 100% 100%, color-mix(in oklab, var(--c-output) 8%, transparent), transparent 60%),
+    var(--ns-background, #0b0b0d);
+}
+
+.rs[data-frozen] {
+  background:
+    radial-gradient(90% 70% at 0% 0%, color-mix(in oklab, var(--c-done) 11%, transparent), transparent 62%),
+    radial-gradient(70% 60% at 100% 100%, color-mix(in oklab, var(--c-output) 7%, transparent), transparent 60%),
+    var(--ns-background, #0b0b0d);
+}
+
+.rs[data-paused] *,
+.rs[data-paused] *::before,
+.rs[data-paused] *::after {
+  animation-play-state: paused !important;
+}
+
+/* --- header ------------------------------------------------------------------ */
+
+.rs-head {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.who {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.who-name {
+  font-weight: 650;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.who-harness {
+  flex: none;
+  font-size: 11px;
+  padding: 1px 7px;
+  border-radius: 6px;
+  color: var(--ns-muted, #a1a1aa);
+  background: var(--ns-surface-secondary, #1f1f23);
+  border: 1px solid var(--line);
+}
+
+.pill {
+  flex: none;
+  margin-left: auto;
+  font-size: 11px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+  color: var(--c-idle);
+  background: color-mix(in oklab, currentColor 10%, transparent);
+  white-space: nowrap;
+}
+.pill--working {
+  color: var(--c-live);
+}
+.pill--needs-input {
+  color: var(--c-wait);
+}
+.pill--finished {
+  color: var(--c-done);
+}
+.pill--exited {
+  color: var(--c-stop);
+}
+
+.dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--c-idle);
+}
+.dot--working {
+  background: var(--c-live);
+  box-shadow: 0 0 0 0 color-mix(in oklab, var(--c-live) 60%, transparent);
+  animation: rs-ping 1.6s ease-out infinite;
+}
+.dot--needs-input {
+  background: var(--c-wait);
+}
+.dot--finished {
+  background: var(--c-done);
+}
+.dot--exited {
+  background: var(--c-stop);
+}
+
+@keyframes rs-ping {
+  to {
+    box-shadow: 0 0 0 7px transparent;
+  }
+}
+
+.model {
+  font-size: 11.5px;
+  color: color-mix(in oklab, var(--ns-foreground, #ececec) 78%, transparent);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* --- hero numbers ------------------------------------------------------------ */
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: 10px;
+}
+
+.hero-cell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px 9px;
+  border-radius: 12px;
+  background: linear-gradient(
+    160deg,
+    color-mix(in oklab, var(--c-live) 14%, var(--tile)),
+    var(--tile) 70%
+  );
+  border: 1px solid color-mix(in oklab, var(--c-live) 28%, var(--line));
+  min-width: 0;
+}
+
+.hero-cell--time {
+  background: linear-gradient(
+    160deg,
+    color-mix(in oklab, var(--c-output) 13%, var(--tile)),
+    var(--tile) 70%
+  );
+  border-color: color-mix(in oklab, var(--c-output) 26%, var(--line));
+}
+
+.rs[data-frozen] .hero-cell {
+  border-color: color-mix(in oklab, var(--c-done) 30%, var(--line));
+}
+
+.label {
+  font-size: 10.5px;
+  color: var(--ns-muted, #a1a1aa);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.big {
+  font-size: clamp(24px, 9cqw, 46px);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.big--time {
+  font-family: var(--ns-font-mono, ui-monospace, monospace);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.rs[data-live] .big--time {
+  color: color-mix(in oklab, var(--c-live) 35%, var(--ns-foreground, #fff));
+  text-shadow: 0 0 22px color-mix(in oklab, var(--c-live) 45%, transparent);
+}
+
+/* --- composition bar --------------------------------------------------------- */
+
+.mix {
+  display: flex;
+  height: 6px;
+  border-radius: 999px;
+  overflow: hidden;
+  gap: 2px;
+  background: var(--ns-surface-secondary, #1f1f23);
+}
+
+.mix-part {
+  min-width: 3px;
+  flex-basis: 0;
+  border-radius: 999px;
+}
+.mix-part--input {
+  background: var(--c-input);
+}
+.mix-part--output {
+  background: var(--c-output);
+}
+.mix-part--cacheRead {
+  background: var(--c-cache-read);
+}
+.mix-part--cacheWrite {
+  background: var(--c-cache-write);
+}
+
+/* --- phase line --------------------------------------------------------------- */
+
+.phase {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.phase-mark {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  border: 1.5px solid var(--c-idle);
+}
+.phase-mark--live {
+  border: none;
+  border-radius: 50%;
+  background: var(--c-live);
+  animation: rs-ping 1.6s ease-out infinite;
+}
+.phase-mark--frozen {
+  border: none;
+  background: var(--c-done);
+}
+
+/* --- tiles -------------------------------------------------------------------- */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 7px 9px 6px;
+  border-radius: 9px;
+  background: var(--tile);
+  border: 1px solid var(--line);
+  min-width: 0;
+  transition: border-color 0.4s;
+}
+
+.tile::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  border-radius: 2px;
+  background: transparent;
+}
+.tile--input::before {
+  background: var(--c-input);
+}
+.tile--output::before {
+  background: var(--c-output);
+}
+.tile--cacheRead::before {
+  background: var(--c-cache-read);
+}
+.tile--cacheWrite::before {
+  background: var(--c-cache-write);
+}
+
+.value {
+  font-size: 17px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.015em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sub {
+  font-size: 10.5px;
+  color: var(--ns-muted, #a1a1aa);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nr {
+  font-size: 12px;
+  font-weight: 500;
+  font-style: italic;
+  letter-spacing: 0;
+  color: var(--ns-muted, #a1a1aa);
+}
+
+.big .nr {
+  font-size: 0.45em;
+}
+
+.flash {
+  animation: rs-flash 1.4s ease-out;
+}
+
+@keyframes rs-flash {
+  0% {
+    border-color: color-mix(in oklab, var(--c-live) 80%, transparent);
+    box-shadow: 0 0 0 1px color-mix(in oklab, var(--c-live) 45%, transparent),
+      0 0 18px color-mix(in oklab, var(--c-live) 30%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+.note {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.35;
+  color: var(--ns-muted, #a1a1aa);
+}
+
+/* --- actions -------------------------------------------------------------------- */
+
+.actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 2px;
+}
+
+.actions .ns-btn {
+  gap: 5px;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.auto {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--ns-muted, #a1a1aa);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.notice {
+  font-size: 11.5px;
+  color: var(--c-done);
+  animation: rs-fade 4s forwards;
+}
+
+@keyframes rs-fade {
+  0%,
+  75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* --- states --------------------------------------------------------------------- */
+
+.rs--state {
+  align-items: center;
+  justify-content: center;
+}
+
+.state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  max-width: 340px;
+  text-align: center;
+}
+
+.state-glyph {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  color: var(--c-live);
+  background: radial-gradient(circle at 30% 20%, color-mix(in oklab, var(--c-live) 22%, transparent), transparent 70%),
+    var(--tile);
+  border: 1px solid color-mix(in oklab, var(--c-live) 25%, var(--line));
+}
+.state-glyph--danger {
+  color: var(--c-stop);
+  border-color: color-mix(in oklab, var(--c-stop) 30%, var(--line));
+}
+
+.state-title {
+  margin: 0;
+  font-weight: 650;
+  font-size: 15px;
+}
+
+.state-body {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--ns-muted, #a1a1aa);
+}
+
+.choose {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+.choose .ns-btn {
+  justify-content: flex-start;
+  gap: 8px;
+}
+.choose .ns-muted {
+  margin-left: auto;
+  font-size: 11px;
+}
+
+/* --- sizes ------------------------------------------------------------------------ */
+
+/* Wide and tall (expanded): bigger numbers, two rows of four. */
+@container rs (min-width: 720px) {
+  .rs {
+    padding: 18px 22px 14px;
+    gap: 14px;
+  }
+  .who-name {
+    font-size: 16px;
+  }
+  .hero-cell {
+    padding: 14px 18px 12px;
+  }
+  .big {
+    font-size: clamp(40px, 7cqw, 72px);
+  }
+  .value {
+    font-size: 22px;
+  }
+  .tile {
+    padding: 10px 12px 9px;
+  }
+  .mix {
+    height: 8px;
+  }
+}
+
+/* Narrow: two columns of tiles. */
+@container rs (max-width: 430px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .auto span {
+    display: none;
+  }
+}
+
+/* Small: the main facts only. */
+@container rs (max-height: 300px) {
+  .grid .tile--cacheRead,
+  .grid .tile--cacheWrite,
+  .grid .tile--working,
+  .grid .tile--cost,
+  .note,
+  .model {
+    display: none;
+  }
+  .actions .ns-btn--ghost,
+  .auto {
+    display: none;
+  }
+}
+
+@container rs (max-height: 220px) {
+  .grid,
+  .phase,
+  .mix {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dot--working,
+  .phase-mark--live,
+  .flash {
+    animation: none;
+  }
+}
+
+/* Flex children keep their size; the card scrolls instead of squeezing a row away. */
+.rs > * {
+  flex-shrink: 0;
+}
+
+.tile .label {
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.25;
+}
+
+.tile .sub {
+  white-space: normal;
+}

@@ -1,0 +1,8 @@
+node_modules
+# packed archives (neurosquad-card pack)
+*.tgz
+# ...except the vendored SDK build this card is built against (see README)
+!vendor/*.tgz
+.DS_Store
+# dist/ is committed: NeuroSquad installs the built card straight from the repository.
+!dist/

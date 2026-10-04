@@ -1,0 +1,35 @@
+{
+  "name": "run-stats",
+  "version": "1.0.0",
+  "private": true,
+  "description": "One NeuroSquad agent's run in exact numbers: prompts, model requests, tokens by kind, elapsed and working time.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "watch": "vite build --watch",
+    "test": "vitest run",
+    "validate": "neurosquad-card validate",
+    "pack": "neurosquad-card pack"
+  },
+  "dependencies": {
+    "@neurosquad/card-sdk": "file:vendor/neurosquad-card-sdk-1.1.0.tgz",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.4",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.0",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.0",
+    "vitest": "^3.2.7"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/glmn-ai/neurosquad-cards.git",
+    "directory": "official-cards/run-stats"
+  }
+}
