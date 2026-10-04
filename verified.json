@@ -1,7 +1,7 @@
 {
   "$schema": "./verified.schema.json",
   "schemaVersion": 1,
-  "updatedAt": "2026-10-04T00:25:51Z",
+  "updatedAt": "2026-10-04T01:02:00Z",
   "cards": [
     {
       "id": "agent-pulse",
@@ -12,9 +12,9 @@
         "zh": "智能体脉搏"
       },
       "description": {
-        "en": "A live pulse of every agent on the canvas: status timelines, turn durations, and how long each one has been waiting for you.",
-        "ru": "Живой пульс всех агентов на холсте: шкалы статусов, длительность ходов и сколько каждый ждёт вашего ответа.",
-        "zh": "画布上所有智能体的实时脉搏：状态时间线、每轮耗时，以及每个智能体等了你多久。"
+        "en": "A live pulse of your agents: every model request of the agents you connect, as bars on a shared timeline (duration, tokens, tool calls), plus status timelines, turn durations and how long each agent has been waiting for you.",
+        "ru": "Живой пульс агентов: каждый запрос к модели у подключённых агентов полосой на общей шкале времени (длительность, токены, вызовы инструментов), а также шкалы статусов, длительность ходов и сколько каждый ждёт вашего ответа.",
+        "zh": "智能体的实时脉搏：已连接智能体的每次模型请求在共享时间轴上显示为条形（耗时、词元、工具调用），以及状态时间线、每轮耗时和每个智能体等了你多久。"
       },
       "author": {
         "name": "NeuroSquad examples",
@@ -22,34 +22,38 @@
       },
       "repo": "glmn-ai/neurosquad-cards",
       "path": "official-cards/agent-pulse",
-      "version": "1.0.0",
-      "commit": "87fa9c29af89594ca64f2278036c659d47ea19d3",
-      "treeHash": "4663ac4db93b69b2b89f32d530ac82df610ef414bc52db48d940ddf7b852e422",
+      "version": "1.1.0",
+      "commit": "32162be2ea5802245872aa2dd66585933fc71383",
+      "treeHash": "83d4b76bb2b01741eb4efd1bebfbcd8a7efb7dd9f845cd8779a0066a339098b3",
       "permissions": [
         "agents.read"
       ],
       "optionalPermissions": [
-        "cards.connected"
+        "cards.connected",
+        "usage.read"
       ],
       "tags": [
         "agents",
         "dashboard",
         "timeline",
-        "monitoring"
+        "monitoring",
+        "requests",
+        "benchmark"
       ],
       "category": "agents",
       "license": "MIT",
       "homepage": "https://github.com/glmn-ai/neurosquad-cards/tree/main/official-cards/agent-pulse",
       "icon": "icon.png",
       "screenshots": [
+        "docs/requests.png",
         "docs/screenshot.png",
         "docs/states.png"
       ],
       "minAppVersion": "0.1.123",
       "official": true,
-      "verifiedAt": "2026-09-25",
+      "verifiedAt": "2026-10-04",
       "reviewer": "glmn-ai",
-      "notes": "Reads agent status only (agents.read), never agent output. No network, no files."
+      "notes": "Reads agent status (agents.read). Optional usage.read, asked when the Requests view opens: model request times, tokens and tool names of arrow-connected agents only, via agents.timeline. Never reads agent output. No network, no files."
     },
     {
       "id": "decision-log",
