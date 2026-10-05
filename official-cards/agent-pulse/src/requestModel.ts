@@ -16,6 +16,10 @@ export interface LaneStats {
   outputTokens: number | null
   /** Counted turns (prompts). */
   prompts: number
+  /** Contract 1.3: requests made by the agent's subagents (already in `requests`); 0 on older apps. */
+  subagentRequests: number
+  /** Distinct subagents that made those requests. */
+  subagents: number
 }
 
 export const durationOf = (request: AgentRequestSpan): number | null =>
@@ -54,8 +58,27 @@ export function laneStats(timeline: AgentTimeline): LaneStats {
     longest,
     inputTokens: sumOrNull(timeline.requests.map((r) => r.inputTokens)),
     outputTokens: sumOrNull(timeline.requests.map((r) => r.outputTokens)),
-    prompts: timeline.turns.filter((turn) => turn.counted).length
+    prompts: timeline.turns.filter((turn) => turn.counted).length,
+    subagentRequests: timeline.requests.filter((r) => r.subagent).length,
+    subagents: new Set(timeline.requests.flatMap((r) => (r.subagent ? [r.subagent.id] : []))).size
   }
+}
+
+/**
+ * Where a lane's bars sit (SVG units, the track is 100 high). A lane with
+ * subagent requests gets a thin sub-lane under the agent's own: subagent
+ * requests often run while the parent waits on them, so they get their own
+ * row instead of overlapping. Without any (or on an app before contract 1.3)
+ * the lane is drawn exactly as before.
+ */
+export interface LaneGeometry {
+  main: { base: number; max: number }
+  sub: { base: number; max: number } | null
+}
+
+export function laneGeometry(timeline: AgentTimeline | null): LaneGeometry {
+  if (!timeline?.requests.some((r) => r.subagent)) return { main: { base: 85, max: 70 }, sub: null }
+  return { main: { base: 62, max: 50 }, sub: { base: 96, max: 26 } }
 }
 
 /** The span of everything worth showing: the first prompt / request → the last end (or now). */

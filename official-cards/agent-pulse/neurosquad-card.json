@@ -7,7 +7,7 @@
     "ru": "Пульс агентов",
     "zh": "智能体脉搏"
   },
-  "version": "1.1.0",
+  "version": "1.2.0",
   "protocol": 1,
   "description": {
     "en": "A live pulse of your agents: every model request of the agents you connect, as bars on a shared timeline (duration, tokens, tool calls), plus status timelines, turn durations and how long each agent has been waiting for you.",
