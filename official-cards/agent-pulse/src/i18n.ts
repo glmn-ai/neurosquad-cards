@@ -18,14 +18,22 @@ export const catalog: Catalog = {
         request: 'model request',
         working: 'working',
         prompt: 'prompt',
-        finished: 'finished'
+        finished: 'finished',
+        subagent: 'subagent request'
       },
       notReported: 'not reported',
       noStart: 'start not logged',
-      tip: { tokens: '{{input}} in · {{output}} out', cache: '{{count}} from cache' },
+      tip: {
+        tokens: '{{input}} in · {{output}} out',
+        cache: '{{count}} from cache',
+        subagent: 'Subagent: {{name}}',
+        subagentUnnamed: 'Subagent'
+      },
       lane: {
         requests_one: '{{count}} request',
         requests_other: '{{count}} requests',
+        inclSub_one: 'incl. {{count}} by subagents',
+        inclSub_other: 'incl. {{count}} by subagents',
         model: '{{time}} model',
         median: 'median {{time}}',
         longest: 'max {{time}}',
@@ -136,16 +144,26 @@ export const catalog: Catalog = {
         request: 'запрос к модели',
         working: 'работает',
         prompt: 'промпт',
-        finished: 'закончил'
+        finished: 'закончил',
+        subagent: 'запрос субагента'
       },
       notReported: 'не сообщается',
       noStart: 'начало не записано',
-      tip: { tokens: '{{input}} ввод · {{output}} вывод', cache: '{{count}} из кеша' },
+      tip: {
+        tokens: '{{input}} ввод · {{output}} вывод',
+        cache: '{{count}} из кеша',
+        subagent: 'Субагент: {{name}}',
+        subagentUnnamed: 'Субагент'
+      },
       lane: {
         requests_one: '{{count}} запрос',
         requests_few: '{{count}} запроса',
         requests_many: '{{count}} запросов',
         requests_other: '{{count}} запроса',
+        inclSub_one: 'из них {{count}} у субагентов',
+        inclSub_few: 'из них {{count}} у субагентов',
+        inclSub_many: 'из них {{count}} у субагентов',
+        inclSub_other: 'из них {{count}} у субагентов',
         model: 'модель {{time}}',
         median: 'медиана {{time}}',
         longest: 'макс. {{time}}',
@@ -257,12 +275,24 @@ export const catalog: Catalog = {
       window: { all: '本次运行', '15m': '15分', '1h': '1时', '4h': '4时' },
       fit: '适配',
       zoomHint: '滚轮缩放，拖动平移',
-      legend: { request: '模型请求', working: '工作中', prompt: '提示', finished: '已完成' },
+      legend: {
+        request: '模型请求',
+        working: '工作中',
+        prompt: '提示',
+        finished: '已完成',
+        subagent: '子智能体请求'
+      },
       notReported: '未报告',
       noStart: '未记录开始时间',
-      tip: { tokens: '输入 {{input}} · 输出 {{output}}', cache: '{{count}} 来自缓存' },
+      tip: {
+        tokens: '输入 {{input}} · 输出 {{output}}',
+        cache: '{{count}} 来自缓存',
+        subagent: '子智能体：{{name}}',
+        subagentUnnamed: '子智能体'
+      },
       lane: {
         requests_other: '{{count}} 次请求',
+        inclSub_other: '含子智能体 {{count}} 次',
         model: '模型 {{time}}',
         median: '中位 {{time}}',
         longest: '最长 {{time}}',

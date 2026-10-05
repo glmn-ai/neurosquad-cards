@@ -4,7 +4,20 @@ A live pulse of every agent on your [NeuroSquad](https://neurosquad.ai) canvas:
 a status timeline per agent, turn counts and durations, and — the number people
 remember — **how long agents have been waiting for you**.
 
-## Requests (new in 1.1)
+## Subagents (new in 1.2)
+
+![Claude Code with two subagents and OpenCode with a task subagent: their requests on a sub-lane](docs/subagents.png)
+
+Requests an agent's **subagents** made (Claude Code's Agent tool, OpenCode /
+Kilo `task` sessions, …) are drawn apart: pink bars on a thin **sub-lane**
+under the agent's own (they often run while the agent waits for them, so they
+do not overlap its bars). Hover one: the subagent's type ("Subagent:
+Explore"). The lane line says "incl. N by subagents"; lane and KPI totals keep
+including them. From `agents.timeline` `requests[].subagent` (Card SDK
+contract 1.3, NeuroSquad 0.1.270+); without it (an older app, or a harness
+that cannot tell them apart) lanes look exactly as in 1.1.
+
+## Requests (1.1)
 
 ![Three CLIs, one model, one prompt each — every model request as a bar](docs/requests.png)
 
@@ -80,16 +93,15 @@ npm run validate   # the app's own checks + the install dialog preview
 npm run pack       # what would be installed, and the tree hash
 ```
 
-Preview states: `?state=filled|empty|loading|error|updated|requests|requests-live&lang=en|ru|zh&live=0`.
+Preview states: `?state=filled|empty|loading|error|updated|requests|requests-live|requests-subagents&lang=en|ru|zh&live=0`.
 In the app: **Settings → Custom cards → Developer mode**, then
 `npx neurosquad-card dev`.
 
 ### The SDK dependency
 
 The card is built against [`@neurosquad/card-sdk`](https://www.npmjs.com/package/@neurosquad/card-sdk)
-1.2.0, vendored as `vendor/neurosquad-card-sdk-1.2.0.tgz` until that version is on
-npm (it is `npm pack` of `packages/card-sdk` at the NeuroSquad commit that added
-`agents.timeline`). On an older app the Requests view says so; Status works. `dist/` is committed on purpose: NeuroSquad installs the
+1.3 from npm. On an app without `agents.timeline` (before 0.1.257) the Requests
+view says so; Status works. Changes: [CHANGELOG.md](CHANGELOG.md). `dist/` is committed on purpose: NeuroSquad installs the
 repository as it is and never runs a build, so rebuild and commit `dist/`
 together with every source change.
 

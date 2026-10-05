@@ -823,3 +823,28 @@ body,
     display: none;
   }
 }
+
+/* --- subagent requests (contract 1.3) ------------------------------------------------ */
+
+:root {
+  --c-subagent: #f472b6;
+}
+.rq-bar--sub {
+  fill: color-mix(in oklab, var(--c-subagent) 80%, white);
+}
+.rq-bar--sub.rq-bar--tick {
+  fill: color-mix(in oklab, var(--c-subagent) 55%, var(--ns-muted, #a1a1aa));
+}
+.rq-sublane {
+  stroke: color-mix(in oklab, var(--c-subagent) 30%, transparent);
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+  vector-effect: non-scaling-stroke;
+}
+.lg-sub {
+  background: color-mix(in oklab, var(--c-subagent) 80%, white);
+}
+.rq-tip-sub {
+  color: color-mix(in oklab, var(--c-subagent) 65%, var(--ns-foreground, #fff));
+  font-weight: 600;
+}

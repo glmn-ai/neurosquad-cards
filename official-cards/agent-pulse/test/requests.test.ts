@@ -5,6 +5,7 @@ import manifest from '../neurosquad-card.json'
 import {
   barHeight,
   dataExtent,
+  laneGeometry,
   laneStats,
   relLabel,
   shortDuration,
@@ -154,5 +155,49 @@ describe('Requests controller', () => {
     live.push(old)
     await old.start()
     expect(old.getSnapshot().phase).toBe('unsupported')
+  })
+})
+
+describe('subagent requests (contract 1.3)', () => {
+  const span = (at: number, subagent?: { id: string; name?: string }) => ({
+    startedAt: at,
+    endedAt: at + 1000,
+    inputTokens: 10,
+    outputTokens: 5,
+    cacheReadTokens: null,
+    cacheWriteTokens: null,
+    ...(subagent ? { subagent } : {})
+  })
+  const timeline = (requests: ReturnType<typeof span>[]) =>
+    ({
+      agentId: 'a',
+      harness: 'claude-code',
+      since: 0,
+      until: 10_000,
+      usageReadable: true,
+      requestTimes: 'start-end',
+      requests,
+      truncated: false,
+      statuses: [],
+      turns: [],
+      scannedAt: 0
+    }) as AgentTimeline
+
+  it('counts subagent requests and distinct subagents; totals include them', () => {
+    const s = laneStats(
+      timeline([span(0), span(2000, { id: 'x', name: 'Explore' }), span(2500, { id: 'y' }), span(4000, { id: 'x' })])
+    )
+    expect(s.requests).toBe(4)
+    expect(s.subagentRequests).toBe(3)
+    expect(s.subagents).toBe(2)
+  })
+
+  it('draws a sub-lane only when a request is marked; old data keeps the old geometry', () => {
+    expect(laneGeometry(timeline([span(0), span(2000)]))).toEqual({ main: { base: 85, max: 70 }, sub: null })
+    expect(laneGeometry(null).sub).toBeNull()
+    const geo = laneGeometry(timeline([span(0), span(2000, { id: 'x' })]))
+    expect(geo.sub).not.toBeNull()
+    expect(geo.main.base).toBeLessThan(geo.sub!.base - geo.sub!.max)
+    expect(laneStats(timeline([span(0)])).subagentRequests).toBe(0)
   })
 })

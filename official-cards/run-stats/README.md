@@ -21,6 +21,31 @@ the same prompt on the same model, put a Run Stats card next to each, compare.
 
 ![States: a local model with unreported cache counts (Russian), a live run (Chinese), small, empty](docs/states.png)
 
+## Subagents (new in 1.1)
+
+![A run where Claude Code handed part of the work to two subagents](docs/subagents.png)
+
+When the agent hands work to **subagents** (Claude Code's Agent tool, OpenCode
+/ Kilo `task` sessions, …), their requests are the agent's — what you pay for —
+so every number above **includes** them. Run Stats 1.1 also shows which part
+they made:
+
+- **"incl. 241,916 by 2 subagents"** under Total tokens and **"11 by
+  subagents"** under Model requests.
+- **Main agent vs subagents** — requests, input, output, cache read, cache
+  write (and total tokens when the card is wide) for the agent's own loop and
+  for its subagents, with a two-part bar of their token shares. A card tall
+  enough (or expanded) shows it open; a smaller one shows a chip on the status
+  line — click it to open the table.
+- Markdown / JSON / *Send to note* carry the breakdown too (JSON: `subagents`
+  with `count`, `mainOnly`).
+- Nothing extra when no subagent ran. On NeuroSquad before 0.1.270, or for a
+  harness whose log cannot tell subagent requests apart, the card looks
+  exactly like 1.0. Same "not reported" rules for each part.
+
+Data: `agents.usage` `subagents` / `mainOnly` (Card SDK contract 1.3,
+NeuroSquad 0.1.270+).
+
 ## The numbers
 
 All of them come from the app (Card SDK `card.agents.usage`, NeuroSquad
@@ -63,17 +88,17 @@ No network, no files, no tools for agents.
 
 ```sh
 npm install
-npm run dev     # standalone preview on the SDK's mock host: ?state=frozen|live|local|empty|choose|unsupported|loading|error&lang=en|ru|zh
+npm run dev     # standalone preview on the SDK's mock host: ?state=frozen|subagents|live|local|empty|choose|unsupported|loading|error&lang=en|ru|zh
 npm test
 npm run build   # commit dist/: NeuroSquad installs the built card from the repository
 npx neurosquad-card validate
 ```
 
-Built against `@neurosquad/card-sdk` 1.1.0, vendored as
-`vendor/neurosquad-card-sdk-1.1.0.tgz` (the npm release of 1.1 is pending; it is
-`npm pack` of `packages/card-sdk` at the NeuroSquad commit that added
-`agents.usage`). The card only needs the app to support `agents.usage`; on an
-older app it says so.
+Built against [`@neurosquad/card-sdk`](https://www.npmjs.com/package/@neurosquad/card-sdk)
+1.3 from npm. The card needs the app to support `agents.usage` (0.1.254+; on an
+older app it says so); the subagent breakdown appears on 0.1.270+.
+
+Changes: [CHANGELOG.md](CHANGELOG.md).
 
 ## License
 

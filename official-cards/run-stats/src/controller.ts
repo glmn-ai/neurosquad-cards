@@ -386,7 +386,11 @@ export class RunController {
         agent: t('export.agent'),
         model: t('export.model'),
         provider: t('export.provider'),
-        window: t('export.window')
+        window: t('export.window'),
+        split: t('split.title'),
+        main: t('split.main'),
+        subagents: t('split.subagents', { count: this.snapshot.usage?.subagents?.count ?? 0 }),
+        part: t('export.part')
       }
     }
   }

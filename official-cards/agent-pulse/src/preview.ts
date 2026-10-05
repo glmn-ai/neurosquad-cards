@@ -1,6 +1,6 @@
 // Standalone preview: the card on the SDK's mock host with a simulated team.
 // Query parameters pick a state for screenshots and manual checks:
-//   ?state=filled (default) | empty | loading | error | updated | requests | requests-live
+//   ?state=filled (default) | empty | loading | error | updated | requests | requests-live | requests-subagents
 //   &lang=en|ru|zh   &live=0 (freeze the simulation)
 import type {
   AgentInfo,
@@ -260,6 +260,7 @@ function benchTimeline(
     })
     t += ms + 800 + rand() * 9000
   }
+  if (state === 'requests-subagents') addSubagents(agentId, requests, rand)
   const end = requests.at(-1)!.endedAt + 600
   const open = liveCut !== Infinity
   return {
@@ -280,6 +281,50 @@ function benchTimeline(
       }
     ]
   }
+}
+
+/** Contract 1.3: Claude Code hands work to two parallel subagents, OpenCode to one `task` subagent. */
+function addSubagents(agentId: string, requests: AgentRequestSpan[], rand: () => number): void {
+  const plan: Record<string, { id: string; name: string; count: number }[]> = {
+    cc: [
+      { id: 'a1f3', name: 'Explore', count: 3 },
+      { id: 'b7c2', name: 'general-purpose', count: 4 }
+    ],
+    oc: [{ id: 'ses_child', name: 'general', count: 3 }]
+  }
+  const subs = plan[agentId]
+  const parent = requests[3]
+  if (!subs || !parent) return
+  parent.tools = [agentId === 'cc' ? 'Agent' : 'task']
+  const added: AgentRequestSpan[] = []
+  subs.forEach((sub, k) => {
+    let t = parent.endedAt + 400 + k * 1300
+    for (let i = 0; i < sub.count; i++) {
+      const ms = 2000 + rand() * 7000
+      added.push({
+        startedAt: Math.round(t),
+        endedAt: Math.round(t + ms),
+        model: 'qwen3.8-flash-next',
+        inputTokens: Math.round(900 + rand() * 4000),
+        outputTokens: Math.round(40 + rand() * 900),
+        cacheReadTokens: Math.round(8000 + i * 1800),
+        cacheWriteTokens: null,
+        tools: i === sub.count - 1 ? [] : ['Read'],
+        subagent: { id: sub.id, name: sub.name }
+      })
+      t += ms + 300 + rand() * 1200
+    }
+  })
+  // The parent's next request waits for its subagents.
+  const shift = Math.max(...added.map((r) => r.endedAt)) + 800 - (requests[4]?.startedAt ?? 0)
+  if (shift > 0)
+    for (const r of requests.slice(4)) {
+      r.startedAt = r.startedAt === null ? null : r.startedAt + shift
+      r.endedAt += shift
+    }
+  for (const r of added) if (!r.tools?.length) delete r.tools
+  requests.push(...added)
+  requests.sort((a, b) => a.endedAt - b.endedAt)
 }
 
 async function requestsPreview(): Promise<Card> {

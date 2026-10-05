@@ -6,6 +6,7 @@ import {
   barHeight,
   dataExtent,
   durationOf,
+  laneGeometry,
   laneStats,
   relLabel,
   shortDuration,
@@ -208,9 +209,13 @@ export function RequestsView({
           const timeline = lane.timeline
           const s = stats[laneIndex]
           const maxOut = Math.max(1, ...(timeline?.requests.map((r) => r.outputTokens ?? 0) ?? [0]))
+          const geo = laneGeometry(timeline)
           const status = timeline?.statuses.at(-1)?.status ?? lane.agent.status
           return (
-            <div key={lane.agent.id} className={`rq-lane st-${status}`}>
+            <div
+              key={lane.agent.id}
+              className={`rq-lane st-${status}${geo.sub ? ' rq-lane--sub' : ''}`}
+            >
               <div className="lane-meta">
                 <span className="lane-dot" />
                 <div className="lane-names">
@@ -244,9 +249,13 @@ export function RequestsView({
                     />
                   ) : null
                 )}
+                {geo.sub && (
+                  <line className="rq-sublane" x1={0} x2={W} y1={geo.sub.base - geo.sub.max - 3} y2={geo.sub.base - geo.sub.max - 3} />
+                )}
                 {timeline?.requests.map((request, i) => {
                   const start = request.startedAt ?? request.endedAt
-                  const h = barHeight(request.outputTokens, maxOut) * 70
+                  const row = request.subagent && geo.sub ? geo.sub : geo.main
+                  const h = barHeight(request.outputTokens, maxOut) * row.max
                   const w = Math.max(
                     request.startedAt === null ? 1.2 : 2.4,
                     x(request.endedAt) - x(start)
@@ -254,10 +263,11 @@ export function RequestsView({
                   return (
                     <rect
                       key={`r${i}`}
-                      className={`rq-bar${request.startedAt === null ? ' rq-bar--tick' : ''}${hover?.lane === laneIndex && hover.request === i ? ' is-hover' : ''}`}
+                      className={`rq-bar${request.startedAt === null ? ' rq-bar--tick' : ''}${request.subagent ? ' rq-bar--sub' : ''}${hover?.lane === laneIndex && hover.request === i ? ' is-hover' : ''}`}
                       x={request.startedAt === null ? x(request.endedAt) - w / 2 : x(start)}
                       width={w}
-                      y={85 - h}
+                      y={row.base - h}
+                      data-subagent={request.subagent?.name ?? request.subagent?.id}
                       height={h}
                       rx={1.5}
                       data-start={request.startedAt ?? undefined}
@@ -314,6 +324,11 @@ export function RequestsView({
         <span>
           <i className="lg lg-bar" /> {t('requests.legend.request')}
         </span>
+        {stats.some((s) => s && s.subagentRequests > 0) && (
+          <span>
+            <i className="lg lg-sub" /> {t('requests.legend.subagent')}
+          </span>
+        )}
         <span>
           <i className="lg lg-band" /> {t('requests.legend.working')}
         </span>
@@ -348,6 +363,13 @@ function TipBody({
   return (
     <>
       <strong>{ms !== null ? shortDuration(ms, t.language) : t('requests.noStart')}</strong>
+      {request.subagent && (
+        <span className="rq-tip-sub">
+          {request.subagent.name
+            ? t('requests.tip.subagent', { name: request.subagent.name })
+            : t('requests.tip.subagentUnnamed')}
+        </span>
+      )}
       {request.model && <span className="ns-mono">{request.model}</span>}
       <span>
         {t('requests.tip.tokens', {
@@ -370,6 +392,7 @@ function TipBody({
 
 function laneLine(s: LaneStats, timeline: AgentTimeline, t: Translator): string {
   const parts = [t('requests.lane.requests', { count: s.requests })]
+  if (s.subagentRequests > 0) parts.push(t('requests.lane.inclSub', { count: s.subagentRequests }))
   if (s.timed > 0) {
     parts.push(t('requests.lane.model', { time: shortDuration(s.modelMs, t.language) }))
     if (s.medianMs !== null)

@@ -1,6 +1,12 @@
 // Pure part of the card: what is stored, the definitions of the numbers as
 // shown, formatting and the Markdown / JSON exports. No host, no React.
-import type { AgentInfo, AgentUsage, CardLanguage } from '@neurosquad/card-sdk'
+import type {
+  AgentInfo,
+  AgentUsage,
+  AgentUsagePart,
+  AgentUsageSubagents,
+  CardLanguage
+} from '@neurosquad/card-sdk'
 
 /** What the card keeps in its instance storage (`run`). */
 export interface RunState {
@@ -174,6 +180,14 @@ export interface ExportMeta {
     model: string
     provider: string
     window: string
+    /** "Main agent vs subagents" (the breakdown's heading). */
+    split: string
+    /** "Main agent". */
+    main: string
+    /** "Subagents (2)" — the row label with the count already in it. */
+    subagents: string
+    /** "Part" (the breakdown table's first column). */
+    part: string
   }
   language: CardLanguage
 }
@@ -203,7 +217,20 @@ export function toMarkdown(usage: AgentUsage, meta: ExportMeta): string {
     '| --- | ---: |'
   ]
   const rows = METRICS.map((key) => `| ${labels[key]} | ${metricText(usage, key, meta)} |`)
-  return [...head, ...rows].join('\n') + '\n'
+  const split = subagentSplit(usage)
+  if (!split) return [...head, ...rows].join('\n') + '\n'
+  const cells = (part: AgentUsagePart): string =>
+    PART_METRICS.map((key) => partText(part, key, meta)).join(' | ')
+  const breakdown = [
+    '',
+    `#### ${labels.split}`,
+    '',
+    `| ${labels.part} | ${PART_METRICS.map((key) => labels[key]).join(' | ')} |`,
+    `| --- | ${PART_METRICS.map(() => '---:').join(' | ')} |`,
+    `| ${labels.main} | ${cells(split.main)} |`,
+    `| ${labels.subagents} | ${cells(split.subagents)} |`
+  ]
+  return [...head, ...rows, ...breakdown].join('\n') + '\n'
 }
 
 /** Machine-readable: raw integers, null = not reported. */
@@ -236,7 +263,14 @@ export function toJson(usage: AgentUsage, agentName: string, frozen: boolean): s
         elapsedMs: usage.elapsedMs,
         workingMs: usage.firstPromptAt === null ? null : usage.workingMs,
         costMicroUsd: usage.costMicroUsd,
-        costPartial: usage.costPartial
+        costPartial: usage.costPartial,
+        // Contract 1.3 (NeuroSquad 0.1.270+): only when the app can tell subagent requests apart.
+        ...(usage.subagents && usage.mainOnly
+          ? {
+              subagents: { count: usage.subagents.count, ...partJson(usage.subagents) },
+              mainOnly: partJson(usage.mainOnly)
+            }
+          : {})
       },
       null,
       2
@@ -250,4 +284,69 @@ export function changedMetrics(before: AgentUsage | null, after: AgentUsage): Me
   return METRICS.filter(
     (key) => !TIME_METRICS.has(key) && metricValue(before, key) !== metricValue(after, key)
   )
+}
+
+// --- subagents (Card SDK contract 1.3) ---------------------------------------------------
+
+/** The columns of the "Main agent vs subagents" breakdown, in order. */
+export const PART_METRICS = ['requests', 'input', 'output', 'cacheRead', 'cacheWrite', 'total', 'cost'] as const
+export type PartKey = (typeof PART_METRICS)[number]
+
+/** The run's two parts — only when subagents made at least one request in the window. */
+export interface SubagentSplit {
+  main: AgentUsagePart
+  subagents: AgentUsageSubagents
+}
+
+/**
+ * The totals already include subagents; this says which part they made. Null
+ * on an older app (the fields are absent), for a harness whose log cannot tell
+ * them apart, or when no subagent ran (count 0) — then the card shows nothing extra.
+ */
+export function subagentSplit(usage: AgentUsage | null): SubagentSplit | null {
+  const subagents = usage?.subagents
+  const main = usage?.mainOnly
+  if (!subagents || !main || !(subagents.count > 0)) return null
+  return { main, subagents }
+}
+
+export function partValue(part: AgentUsagePart, key: PartKey): number | null {
+  switch (key) {
+    case 'requests':
+      return part.requests
+    case 'input':
+      return part.inputTokens
+    case 'output':
+      return part.outputTokens
+    case 'cacheRead':
+      return part.cacheReadTokens
+    case 'cacheWrite':
+      return part.cacheWriteTokens
+    case 'total':
+      return part.totalTokens
+    case 'cost':
+      return part.costMicroUsd
+  }
+}
+
+/** A part's number as text: "not reported" / "no price" when null, never 0. */
+export function partText(part: AgentUsagePart, key: PartKey, meta: Pick<ExportMeta, 'labels' | 'language'>): string {
+  const value = partValue(part, key)
+  if (key === 'cost') return value === null ? meta.labels.noPrice : formatUsd(value)
+  return value === null ? meta.labels.notReported : formatInt(value, meta.language)
+}
+
+function partJson(part: AgentUsagePart): Record<string, unknown> {
+  return {
+    modelRequests: part.requests,
+    tokens: {
+      input: part.inputTokens,
+      output: part.outputTokens,
+      reasoning: part.reasoningTokens,
+      cacheRead: part.cacheReadTokens,
+      cacheWrite: part.cacheWriteTokens,
+      total: part.totalTokens
+    },
+    costMicroUsd: part.costMicroUsd
+  }
 }
