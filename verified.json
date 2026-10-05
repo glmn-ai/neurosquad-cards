@@ -1,7 +1,7 @@
 {
   "$schema": "./verified.schema.json",
   "schemaVersion": 1,
-  "updatedAt": "2026-10-04T01:02:00Z",
+  "updatedAt": "2026-10-05T14:00:00Z",
   "cards": [
     {
       "id": "agent-pulse",
@@ -22,9 +22,9 @@
       },
       "repo": "glmn-ai/neurosquad-cards",
       "path": "official-cards/agent-pulse",
-      "version": "1.1.0",
-      "commit": "32162be2ea5802245872aa2dd66585933fc71383",
-      "treeHash": "83d4b76bb2b01741eb4efd1bebfbcd8a7efb7dd9f845cd8779a0066a339098b3",
+      "version": "1.2.0",
+      "commit": "fd93230d81e7952f4573139e53b4fd87e206ed24",
+      "treeHash": "d708838835b18ff88c4aae528cfe247dac2b16ccef952d7e07da213c8a50405c",
       "permissions": [
         "agents.read"
       ],
@@ -47,13 +47,14 @@
       "screenshots": [
         "docs/requests.png",
         "docs/screenshot.png",
-        "docs/states.png"
+        "docs/states.png",
+        "docs/subagents.png"
       ],
       "minAppVersion": "0.1.123",
       "official": true,
-      "verifiedAt": "2026-10-04",
+      "verifiedAt": "2026-10-05",
       "reviewer": "glmn-ai",
-      "notes": "Reads agent status (agents.read). Optional usage.read, asked when the Requests view opens: model request times, tokens and tool names of arrow-connected agents only, via agents.timeline. Never reads agent output. No network, no files."
+      "notes": "Reads agent status (agents.read). Optional usage.read, asked when the Requests view opens: model request times, tokens and tool names of arrow-connected agents only, via agents.timeline (1.2: subagent requests drawn apart from the same data, app 0.1.270+). Never reads agent output. No network, no files."
     },
     {
       "id": "decision-log",
@@ -269,9 +270,9 @@
       },
       "repo": "glmn-ai/neurosquad-cards",
       "path": "official-cards/run-stats",
-      "version": "1.0.0",
-      "commit": "97562066e30eee34551ca614985d85aadf1d3eca",
-      "treeHash": "049b3685a2adfaab14a272a8b9dcee9eaf9950b13766e3925eec96074c2f1916",
+      "version": "1.1.0",
+      "commit": "2bf4a2d9721821aa3bd3bedd8ee33d43cff266e8",
+      "treeHash": "8460b7c35d96bd8bc0b014af4583930f537efe991d31a0ca9c2966ca7baf09dd",
       "permissions": [
         "agents.read",
         "usage.read"
@@ -293,13 +294,14 @@
       "icon": "icon.png",
       "screenshots": [
         "docs/screenshot.png",
-        "docs/states.png"
+        "docs/states.png",
+        "docs/subagents.png"
       ],
       "minAppVersion": "0.1.254",
       "official": true,
-      "verifiedAt": "2026-10-04",
+      "verifiedAt": "2026-10-05",
       "reviewer": "glmn-ai",
-      "notes": "Reads the connected agent's token counts and timing through agents.usage (usage.read, arrow-connected agents only) and its status (agents.read). Never reads agent output. No network, no files. Clipboard and notes only on request (optional permissions)."
+      "notes": "Reads the connected agent's token counts and timing through agents.usage (usage.read, arrow-connected agents only) and its status (agents.read). Never reads agent output. No network, no files. Clipboard and notes only on request (optional permissions). 1.1: the main agent vs subagents split from the same agents.usage call (app 0.1.270+)."
     },
     {
       "id": "signal-router",
