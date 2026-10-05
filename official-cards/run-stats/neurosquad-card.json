@@ -7,7 +7,7 @@
     "ru": "Статистика прогона",
     "zh": "运行统计"
   },
-  "version": "1.0.0",
+  "version": "1.1.0",
   "protocol": 1,
   "minAppVersion": "0.1.254",
   "description": {

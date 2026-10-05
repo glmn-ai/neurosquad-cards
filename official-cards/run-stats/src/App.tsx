@@ -7,8 +7,12 @@ import {
   formatInt,
   formatUsd,
   harnessLabel,
+  partValue,
   stopwatch,
-  type MetricKey
+  subagentSplit,
+  type MetricKey,
+  type PartKey,
+  type SubagentSplit
 } from './model'
 
 /** Re-renders once a second — only while someone can see the card and a turn is under way. */
@@ -25,15 +29,28 @@ function useNow(active: boolean): number {
 
 const FLASH_MS = 1400
 
+/** The card's height (the frame is the card): decides whether the breakdown opens by itself. */
+function useWindowHeight(): number {
+  const [height, setHeight] = useState(() => window.innerHeight)
+  useEffect(() => {
+    const onResize = (): void => setHeight(window.innerHeight)
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
+  return height
+}
+
 export function App({ run }: { run: RunController }): React.JSX.Element {
   const snap = useSyncExternalStore(run.subscribe, run.getSnapshot)
   const t = useTranslator(catalog)
   const paused = usePaused()
-  useCardContext() // re-render on settings / theme / size changes
+  const context = useCardContext() // re-render on settings / theme / size changes
   const usage = snap.usage
   const frozen = snap.state.frozenUntil !== undefined
   const live = !paused && !frozen && (usage?.status === 'working' || usage?.status === 'needs-input')
   const now = useNow(live)
+  const height = useWindowHeight()
+  const [splitToggled, setSplitToggled] = useState<boolean | null>(null)
 
   if (snap.phase === 'loading') {
     return (
@@ -112,6 +129,15 @@ export function App({ run }: { run: RunController }): React.JSX.Element {
           }).format(sinceAt)
         })
       : ''
+  // Contract 1.3: the part subagents made (null on older apps or when none ran: nothing extra).
+  const split = subagentSplit(usage)
+  const incl = (value: number | null): string | undefined =>
+    split
+      ? value === null
+        ? t('incl.plain', { count: split.subagents.count })
+        : t('incl.value', { count: split.subagents.count, value: formatInt(value, lang) })
+      : undefined
+  const splitOpen = splitToggled ?? (context.expanded || height >= SPLIT_ROOMY_H)
   const tokens = (value: number | null): React.JSX.Element =>
     value === null ? <span className="nr">{t('notReported')}</span> : <>{formatInt(value, lang)}</>
 
@@ -145,6 +171,7 @@ export function App({ run }: { run: RunController }): React.JSX.Element {
           <span className="big">
             {usage && usage.totalTokens !== null ? formatInt(usage.totalTokens, lang) : started ? t('notReported') : '0'}
           </span>
+          {split && <span className="hero-sub">{incl(split.subagents.totalTokens)}</span>}
         </div>
         <div className="hero-cell hero-cell--time">
           <span className="label" title={t('hint.elapsed')}>
@@ -162,11 +189,34 @@ export function App({ run }: { run: RunController }): React.JSX.Element {
         <span className={`phase-mark${frozen ? ' phase-mark--frozen' : started ? ' phase-mark--live' : ''}`} />
         <span>{phaseText}</span>
         {sinceText && <span className="ns-muted">{sinceText}</span>}
+        {split && !splitOpen && (
+          <button
+            type="button"
+            className="split-chip"
+            aria-expanded={false}
+            title={t('split.title')}
+            onClick={() => setSplitToggled(true)}
+          >
+            <Chevron />
+            {t('split.subagents', { count: split.subagents.count })}
+            <SplitBar split={split} t={t} />
+          </button>
+        )}
       </div>
 
       <section className="grid">
         <Tile k="prompts" t={t} flash={flashing('prompts')} value={usage ? formatInt(usage.prompts, lang) : '0'} />
-        <Tile k="requests" t={t} flash={flashing('requests')} value={usage ? tokens(usage.requests) : '0'} />
+        <Tile
+          k="requests"
+          t={t}
+          flash={flashing('requests')}
+          value={usage ? tokens(usage.requests) : '0'}
+          sub={
+            split && split.subagents.requests !== null
+              ? t('incl.requests', { value: formatInt(split.subagents.requests, lang) })
+              : undefined
+          }
+        />
         <Tile k="input" t={t} flash={flashing('input')} value={usage ? tokens(usage.inputTokens) : '0'} />
         <Tile
           k="output"
@@ -196,6 +246,8 @@ export function App({ run }: { run: RunController }): React.JSX.Element {
           }
         />
       </section>
+
+      {split && splitOpen && <SplitPanel split={split} t={t} onCollapse={() => setSplitToggled(false)} />}
 
       {usage && !usage.usageReadable && <p className="note">{t('unreadable')}</p>}
       {usage && !usage.timingComplete && <p className="note">{t('partial')}</p>}
@@ -305,6 +357,109 @@ function Composition({
           />
         ))}
     </div>
+  )
+}
+
+const SPLIT_COLUMNS: readonly PartKey[] = ['requests', 'input', 'output', 'cacheRead', 'cacheWrite', 'total']
+/** From this card height the breakdown opens by itself; below it is one line until clicked. */
+const SPLIT_ROOMY_H = 540
+
+/** "Main agent vs subagents": the totals above, split into the agent's own loop and its subagents. */
+function SplitPanel({
+  split,
+  t,
+  onCollapse
+}: {
+  split: SubagentSplit
+  t: Translator
+  onCollapse: () => void
+}): React.JSX.Element {
+  const lang = t.language
+  const subLabel = t('split.subagents', { count: split.subagents.count })
+  const rows = [
+    { key: 'main', label: t('split.main'), part: split.main },
+    { key: 'sub', label: subLabel, part: split.subagents }
+  ] as const
+  return (
+    <section className="split" aria-label={t('split.title')}>
+      <button type="button" className="split-head" aria-expanded onClick={onCollapse}>
+        <Chevron />
+        <span className="label">{t('split.title')}</span>
+        <span className="split-hint">{t('split.hint')}</span>
+      </button>
+      <SplitBar split={split} t={t} />
+      <table className="split-table">
+        <thead>
+          <tr>
+            <th scope="col" />
+            {SPLIT_COLUMNS.map((key) => (
+              <th key={key} scope="col" className={`col col--${key}`} title={t(`hint.${key}`)}>
+                {key === 'requests' ? t('split.requests') : t(`metric.${key}`)}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr key={row.key} className={`split-row split-row--${row.key}`}>
+              <th scope="row">
+                <span className="split-dot" aria-hidden />
+                {row.label}
+              </th>
+              {SPLIT_COLUMNS.map((key) => {
+                const value = partValue(row.part, key)
+                return (
+                  <td key={key} className={`col col--${key}`}>
+                    {value === null ? <span className="nr">{t('notReported')}</span> : formatInt(value, lang)}
+                  </td>
+                )
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </section>
+  )
+}
+
+/** Main agent vs subagents as a two-part bar (share of the total tokens). */
+function SplitBar({ split, t }: { split: SubagentSplit; t: Translator }): React.JSX.Element | null {
+  const lang = t.language
+  const subLabel = t('split.subagents', { count: split.subagents.count })
+  const mainTokens = split.main.totalTokens ?? 0
+  const subTokens = split.subagents.totalTokens ?? 0
+  const sum = mainTokens + subTokens
+  const pct = (value: number): string =>
+    new Intl.NumberFormat(lang === 'ru' ? 'ru-RU' : lang === 'zh' ? 'zh-CN' : 'en-US', {
+      style: 'percent',
+      maximumFractionDigits: 1
+    }).format(value / sum)
+  if (sum <= 0) return null
+  return (
+    <div className="split-bar" aria-hidden>
+      {mainTokens > 0 && (
+        <span
+          className="split-seg split-seg--main"
+          style={{ flexGrow: mainTokens / sum }}
+          title={t('split.share', { part: t('split.main'), percent: pct(mainTokens) })}
+        />
+      )}
+      {subTokens > 0 && (
+        <span
+          className="split-seg split-seg--sub"
+          style={{ flexGrow: subTokens / sum }}
+          title={t('split.share', { part: subLabel, percent: pct(subTokens) })}
+        />
+      )}
+    </div>
+  )
+}
+
+function Chevron(): React.JSX.Element {
+  return (
+    <svg className="split-chevron" viewBox="0 0 20 20" width="12" height="12" fill="currentColor" aria-hidden>
+      <path d="M7.2 4.2a1 1 0 0 1 1.4 0l5 5a1 1 0 0 1 0 1.4l-5 5a1 1 0 1 1-1.4-1.4L11.5 10 7.2 5.7a1 1 0 0 1 0-1.5z" />
+    </svg>
   )
 }
 

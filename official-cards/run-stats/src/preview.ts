@@ -1,6 +1,6 @@
 // Standalone preview: the card on the SDK's mock host with a simulated run.
 // Query parameters pick a state for screenshots and manual checks:
-//   ?state=frozen (default) | live | local | empty | choose | unsupported | loading | error
+//   ?state=frozen (default) | subagents | live | local | empty | choose | unsupported | loading | error
 //   &lang=en|ru|zh
 import type { AgentInfo, AgentUsage, Card, CardManifest } from '@neurosquad/card-sdk'
 import { createMockHost, type MockHost } from '@neurosquad/card-sdk/testing'
@@ -33,7 +33,43 @@ let previewHost: MockHost | null = null
 let started = 0
 
 /** A believable run: grows while "live", a finished 6-minute run otherwise. */
+/** Contract 1.3: two subagents made this part of the frozen run (?state=subagents). */
+const SUBAGENTS = {
+  count: 2,
+  requests: 11,
+  inputTokens: 6_120,
+  outputTokens: 3_388,
+  reasoningTokens: 640,
+  cacheReadTokens: 214_506,
+  cacheWriteTokens: 17_902,
+  totalTokens: 6_120 + 3_388 + 214_506 + 17_902,
+  costMicroUsd: 201_337
+}
+
+function withSubagents(usage: Partial<AgentUsage>): Partial<AgentUsage> {
+  if (state !== 'subagents') return usage
+  const minus = (a: number | null | undefined, b: number): number | null => (a == null ? null : a - b)
+  return {
+    ...usage,
+    subagents: SUBAGENTS,
+    mainOnly: {
+      requests: minus(usage.requests, SUBAGENTS.requests),
+      inputTokens: minus(usage.inputTokens, SUBAGENTS.inputTokens),
+      outputTokens: minus(usage.outputTokens, SUBAGENTS.outputTokens),
+      reasoningTokens: minus(usage.reasoningTokens, SUBAGENTS.reasoningTokens),
+      cacheReadTokens: minus(usage.cacheReadTokens, SUBAGENTS.cacheReadTokens),
+      cacheWriteTokens: minus(usage.cacheWriteTokens, SUBAGENTS.cacheWriteTokens),
+      totalTokens: minus(usage.totalTokens, SUBAGENTS.totalTokens),
+      costMicroUsd: minus(usage.costMicroUsd, SUBAGENTS.costMicroUsd)
+    }
+  }
+}
+
 function usageAt(since: number, until: number): Partial<AgentUsage> {
+  return withSubagents(baseUsageAt(since, until))
+}
+
+function baseUsageAt(since: number, until: number): Partial<AgentUsage> {
   const live = state === 'live'
   const runMs = live ? Math.max(0, until - started) : 6 * 60_000 + 42_000
   const k = live ? Math.min(1, runMs / 240_000) : 1
@@ -88,7 +124,7 @@ export async function previewCard(): Promise<Card> {
       throw new Error('The workspace is closing — try again in a moment.')
     })
   }
-  if (state === 'frozen' || state === 'local') {
+  if (state === 'frozen' || state === 'local' || state === 'subagents') {
     const since = Date.now() - 9 * 60_000
     host.storage.instance.set('run', {
       agentId: 'bench',

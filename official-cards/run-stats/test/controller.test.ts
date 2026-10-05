@@ -175,6 +175,91 @@ describe('the numbers', () => {
     expect(overview).toMatchObject({ primary: '1.5K tokens · 1:00', secondary: '9 requests · Claude Code' })
   })
 
+  it('without subagent fields (an app before contract 1.3) the exports are exactly as before', async () => {
+    const { run } = await setup({ agentUsage: { bench: finished() } })
+    await run.refresh()
+    await settle()
+    expect(run.markdown()).not.toContain('subagent')
+    const json = JSON.parse(run.json()!)
+    expect('subagents' in json).toBe(false)
+    expect('mainOnly' in json).toBe(false)
+  })
+
+  it('no extra section when the app can tell subagents apart but none ran', async () => {
+    const zero = {
+      requests: 0,
+      inputTokens: 0,
+      outputTokens: 0,
+      cacheReadTokens: null,
+      cacheWriteTokens: null,
+      reasoningTokens: null,
+      totalTokens: 0,
+      costMicroUsd: null
+    }
+    const { run } = await setup({
+      agentUsage: {
+        bench: finished({
+          subagents: { ...zero, count: 0 },
+          mainOnly: { ...zero, requests: 9, inputTokens: 1200, outputTokens: 340, totalTokens: 1540 }
+        })
+      }
+    })
+    await run.refresh()
+    await settle()
+    expect(run.markdown()).not.toContain('Main agent vs subagents')
+    expect(JSON.parse(run.json()!).subagents).toMatchObject({ count: 0, modelRequests: 0 })
+  })
+
+  it('exports the main agent vs subagents breakdown (contract 1.3)', async () => {
+    const { run } = await setup({
+      agentUsage: {
+        bench: finished({
+          subagents: {
+            count: 2,
+            requests: 3,
+            inputTokens: 500,
+            outputTokens: 40,
+            cacheReadTokens: null,
+            cacheWriteTokens: null,
+            reasoningTokens: null,
+            totalTokens: 540,
+            costMicroUsd: null
+          },
+          mainOnly: {
+            requests: 6,
+            inputTokens: 700,
+            outputTokens: 300,
+            cacheReadTokens: null,
+            cacheWriteTokens: null,
+            reasoningTokens: null,
+            totalTokens: 1000,
+            costMicroUsd: null
+          }
+        })
+      }
+    })
+    await run.refresh()
+    await settle()
+    const md = run.markdown()!
+    // The totals keep including subagents.
+    expect(md).toContain('| Model requests | 9 |')
+    expect(md).toContain('#### Main agent vs subagents')
+    expect(md).toContain(
+      '| Part | Model requests | Input | Output | Cache read | Cache write | Total tokens | Cost |'
+    )
+    expect(md).toContain('| Main agent | 6 | 700 | 300 | not reported | not reported | 1,000 | no price |')
+    expect(md).toContain('| 2 subagents | 3 | 500 | 40 | not reported | not reported | 540 | no price |')
+    const json = JSON.parse(run.json()!)
+    expect(json.modelRequests).toBe(9)
+    expect(json.subagents).toEqual({
+      count: 2,
+      modelRequests: 3,
+      tokens: { input: 500, output: 40, reasoning: null, cacheRead: null, cacheWrite: null, total: 540 },
+      costMicroUsd: null
+    })
+    expect(json.mainOnly).toMatchObject({ modelRequests: 6, tokens: { input: 700, total: 1000 } })
+  })
+
   it('does not freeze with the setting off; freeze / unfreeze / new run by hand', async () => {
     const { host, run, clock } = await setup({
       agentUsage: { bench: finished() },

@@ -31,6 +31,22 @@ export const catalog: Catalog = {
     notReported: 'not reported',
     noPrice: 'no price',
     reasoning: '{{count}} reasoning',
+    incl: {
+      value_one: 'incl. {{value}} by {{count}} subagent',
+      value_other: 'incl. {{value}} by {{count}} subagents',
+      plain_one: 'incl. {{count}} subagent',
+      plain_other: 'incl. {{count}} subagents',
+      requests: '{{value}} by subagents'
+    },
+    split: {
+      title: 'Main agent vs subagents',
+      hint: 'Already included in the totals above.',
+      main: 'Main agent',
+      subagents_one: '{{count}} subagent',
+      subagents_other: '{{count}} subagents',
+      requests: 'Requests',
+      share: '{{part}}: {{percent}} of the tokens'
+    },
     status: {
       working: 'working',
       'needs-input': 'waiting for you',
@@ -94,7 +110,8 @@ export const catalog: Catalog = {
       agent: 'Agent',
       model: 'Model',
       provider: 'Provider',
-      window: 'Run'
+      window: 'Run',
+      part: 'Part'
     }
   },
   ru: {
@@ -126,6 +143,28 @@ export const catalog: Catalog = {
     notReported: 'не сообщается',
     noPrice: 'нет цены',
     reasoning: 'рассуждения: {{count}}',
+    incl: {
+      value_one: 'из них {{value}} — у {{count}} субагента',
+      value_few: 'из них {{value}} — у {{count}} субагентов',
+      value_many: 'из них {{value}} — у {{count}} субагентов',
+      value_other: 'из них {{value}} — у {{count}} субагента',
+      plain_one: 'с учётом {{count}} субагента',
+      plain_few: 'с учётом {{count}} субагентов',
+      plain_many: 'с учётом {{count}} субагентов',
+      plain_other: 'с учётом {{count}} субагента',
+      requests: '{{value}} — у субагентов'
+    },
+    split: {
+      title: 'Основной агент и субагенты',
+      hint: 'Уже входит в итоги выше.',
+      main: 'Основной агент',
+      subagents_one: '{{count}} субагент',
+      subagents_few: '{{count}} субагента',
+      subagents_many: '{{count}} субагентов',
+      subagents_other: '{{count}} субагента',
+      requests: 'Запросы',
+      share: '{{part}}: {{percent}} токенов'
+    },
     status: {
       working: 'работает',
       'needs-input': 'ждёт вас',
@@ -191,7 +230,8 @@ export const catalog: Catalog = {
       agent: 'Агент',
       model: 'Модель',
       provider: 'Провайдер',
-      window: 'Прогон'
+      window: 'Прогон',
+      part: 'Часть'
     }
   },
   zh: {
@@ -223,6 +263,19 @@ export const catalog: Catalog = {
     notReported: '未报告',
     noPrice: '无价格',
     reasoning: '其中推理 {{count}}',
+    incl: {
+      value_other: '含 {{count}} 个子智能体的 {{value}}',
+      plain_other: '含 {{count}} 个子智能体',
+      requests: '子智能体 {{value}}'
+    },
+    split: {
+      title: '主智能体与子智能体',
+      hint: '已计入上方总数。',
+      main: '主智能体',
+      subagents_other: '{{count}} 个子智能体',
+      requests: '请求',
+      share: '{{part}}：占词元 {{percent}}'
+    },
     status: {
       working: '工作中',
       'needs-input': '等你处理',
@@ -285,7 +338,8 @@ export const catalog: Catalog = {
       agent: '智能体',
       model: '模型',
       provider: '服务商',
-      window: '运行'
+      window: '运行',
+      part: '部分'
     }
   }
 }
